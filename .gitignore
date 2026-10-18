@@ -1,0 +1,48 @@
+# Standaard wordt alles genegeerd; alleen wat hieronder is vrijgegeven komt in Git.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/CHANGELOG.md
+!/ROADMAP.md
+!/Android/
+!/Docs/
+!/Phyton/
+
+# --- Android: alleen de projectbroncode ---
+/Android/*
+!/Android/ScoreKrijtApp/
+/Android/ScoreKrijtApp/.gradle/
+/Android/ScoreKrijtApp/.idea/
+/Android/ScoreKrijtApp/.kotlin/
+/Android/ScoreKrijtApp/build/
+/Android/ScoreKrijtApp/app/build/
+/Android/ScoreKrijtApp/app/debug/
+/Android/ScoreKrijtApp/local.properties
+
+# --- Python (SK-Box): alleen de huidige versie ---
+/Phyton/*
+!/Phyton/V2.8.5 Bleutooth/
+__pycache__/
+*.pyc
+build/
+dist/
+matches/
+
+# --- Handleidingen: documenten en bouwscripts, geen tussenbestanden ---
+/Docs/.skbox_*/
+/Docs/rendered_handleiding/
+/Docs/*.pptx
+/Docs/*.gdoc
+/Docs/*.gsheet
+/Docs/Fonts.docx
+# Van de logomap is alleen het logo nodig dat de bouwscripts gebruiken
+/Docs/Logos/*
+!/Docs/Logos/ScoreKrijt Logo.png
+
+# --- Overig ---
+~$*
+desktop.ini
+*.apk
+*.keystore
+*.jks

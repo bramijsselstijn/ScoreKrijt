@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ScoreKrijtApp" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Primary Green (Logo Color) -->
+        <item name="colorPrimary">@color/edit_green</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">#D1E8C5</item>
+        <item name="colorOnPrimaryContainer">@color/edit_green</item>
+
+        <!-- Secondary Green -->
+        <item name="colorSecondary">@color/stats_green</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">#E8F5E9</item>
+        <item name="colorOnSecondaryContainer">@color/stats_green</item>
+
+        <!-- Tertiary Green/Neutral -->
+        <item name="colorTertiary">#2E7D32</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">#C8E6C9</item>
+        <item name="colorOnTertiaryContainer">#1B5E20</item>
+
+        <!-- Status Bar -->
+        <item name="android:statusBarColor">@color/edit_green</item>
+    </style>
+
+    <style name="Theme.ScoreKrijtApp" parent="Base.Theme.ScoreKrijtApp" />
+</resources>
