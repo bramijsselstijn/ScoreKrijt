@@ -22,12 +22,24 @@
 
 # --- Python (SK-Box): alleen de huidige versie ---
 /Phyton/*
-!/Phyton/V2.8.5 Bleutooth/
+!/Phyton/V2.8.7/
+!/Phyton/SK-Box_scripts/
+# Door de SK-Box zelf gemaakt tijdens het draaien
+scorekrijt-autostart.log
+scorekrijt.lock
+scorekrijt.ready
 __pycache__/
 *.pyc
 build/
 dist/
 matches/
+
+# --- SK-Box behuizing: alleen de 3D-printbestanden (geen SolidWorks-bestanden) ---
+!/SK-Box/
+/SK-Box/*
+!/SK-Box/Base-Part.3mf
+!/SK-Box/Base-Part.STL
+!/SK-Box/Part3^Assem1.STL
 
 # --- Handleidingen: documenten en bouwscripts, geen tussenbestanden ---
 /Docs/.skbox_*/
