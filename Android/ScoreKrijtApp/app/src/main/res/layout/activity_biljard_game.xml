@@ -40,6 +40,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:background="@color/gray_header"
+            android:foreground="@drawable/bevel_raised_small"
             android:gravity="center"
             android:padding="4dp"
             android:text="@string/help_menu_label"
@@ -59,6 +60,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:background="@color/gray_header"
+            android:foreground="@drawable/bevel_raised_small"
             android:gravity="center"
             android:padding="4dp"
             android:text="@string/settings_label"
@@ -193,6 +195,7 @@
                     android:layout_weight="1"
                     android:background="@color/gray_background"
                     android:gravity="center"
+                    android:id="@+id/tv_p1_points_label"
                     android:text="@string/points"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -243,13 +246,19 @@
             android:layout_height="match_parent"
             android:background="@color/black" />
 
-        <!-- Center Inning Column -->
+        <!-- Center Inning Column: tikken toont het tijdelijke wedstrijdoverzicht -->
         <LinearLayout
+            android:id="@+id/inning_column"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/gray_header"
-            android:gravity="center"
+            android:clickable="true"
+            android:contentDescription="Tijdelijk wedstrijd overzicht"
+            android:focusable="true"
+            android:foreground="@drawable/bevel_raised_small"
+            android:gravity="top|center_horizontal"
+            android:paddingTop="4dp"
             android:orientation="vertical">
 
             <TextView
@@ -257,7 +266,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/inning"
                 android:textColor="@color/black"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -324,6 +333,7 @@
                     android:layout_weight="1"
                     android:background="@color/gray_background"
                     android:gravity="center"
+                    android:id="@+id/tv_p2_points_label"
                     android:text="@string/points"
                     android:textSize="11sp" />
 
@@ -469,6 +479,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/undo_red"
+                android:elevation="0dp"
+                android:foreground="@drawable/bevel_raised"
+                android:stateListAnimator="@null"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
                 android:insetRight="0dp"
@@ -487,6 +500,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="2.5"
                 android:backgroundTint="@color/edit_green"
+                android:elevation="0dp"
+                android:foreground="@drawable/bevel_raised"
+                android:stateListAnimator="@null"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
                 android:insetRight="0dp"
@@ -512,6 +528,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/btn_gray"
+                android:elevation="0dp"
+                android:foreground="@drawable/bevel_raised"
+                android:stateListAnimator="@null"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
                 android:insetRight="0dp"
@@ -529,6 +548,9 @@
                 android:layout_height="0dp"
                 android:layout_weight="2.5"
                 android:backgroundTint="@color/btn_gray"
+                android:elevation="0dp"
+                android:foreground="@drawable/bevel_raised"
+                android:stateListAnimator="@null"
                 android:insetLeft="0dp"
                 android:insetTop="0dp"
                 android:insetRight="0dp"

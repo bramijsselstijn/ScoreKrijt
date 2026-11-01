@@ -5,7 +5,7 @@ Created on Sat Apr 13 10:33:42 2024
 @author: BramI
 """
 
-APP_VERSION = "2.8.5"
+APP_VERSION = "2.8.7.1"
 
 class FieldTypes:
     string = 1

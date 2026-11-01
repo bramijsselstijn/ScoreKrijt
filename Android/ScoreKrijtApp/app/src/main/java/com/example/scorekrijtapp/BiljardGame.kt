@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
+import android.view.View
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -200,11 +201,14 @@ class BiljardGame : AppCompatActivity() {
             .show()
     }
 
-    private fun saveGameState() {
-        if (matchFinished) return
+    // Bij een afgeronde wedstrijd (finished = true) blijft de eindstand bewaard, zodat het hoofdmenu de laatste
+    // wedstrijd kan heropenen. Daarna schrijft alleen nog de afronding zelf de stand weg.
+    private fun saveGameState(finished: Boolean = false) {
+        if (matchFinished && !finished) return
         val prefs = getSharedPreferences("ScoreKrijtState", MODE_PRIVATE)
         val editor = prefs.edit()
         editor.putBoolean("GAME_IN_PROGRESS", true)
+        editor.putBoolean("GAME_FINISHED", finished)
         editor.putString("P1_NAME", p1Name)
         editor.putString("P2_NAME", p2Name)
         editor.putFloat("P1_TMC", p1TMC.toFloat())
@@ -276,12 +280,16 @@ class BiljardGame : AppCompatActivity() {
                 turnHistory.add(TurnRecord(obj.getInt("turn"), p1Score, p1Total, p2Score, p2Total))
             }
         }
-        refreshPlayerLabels()
-    }
 
-    private fun clearSavedState() {
-        val prefs = getSharedPreferences("ScoreKrijtState", MODE_PRIVATE)
-        prefs.edit().putBoolean("GAME_IN_PROGRESS", false).apply()
+        // Na het einde van de wedstrijd staat de laatste beurt van speler 2 al genoteerd. Haal die noteer terug,
+        // zodat beurt 30 (de laatste beurt) weer bij speler 2 loopt en de score nog aangepast kan worden.
+        val lastRecord = turnHistory.getOrNull(turnNumber - 1)
+        if (!isPlayer1Turn && lastRecord != null && lastRecord.p2TotalAtEnd != null) {
+            lastRecord.p2Noted()?.let { player2TotalCar -= it }
+            lastRecord.p2TotalAtEnd = null
+            currentTurnCar = lastRecord.p2Score ?: currentTurnCar
+        }
+        refreshPlayerLabels()
     }
 
     private fun initializeViews() {
@@ -331,6 +339,9 @@ class BiljardGame : AppCompatActivity() {
                 sendBluetoothMatchMessage("score_minus")
             }
         }
+
+        // Tik op de beurt in het midden: tijdelijk wedstrijdoverzicht
+        findViewById<View>(R.id.inning_column).setOnClickListener { showTemporaryMatchSummaryDialog() }
 
         findViewById<Button>(R.id.btn_edit).setOnClickListener { noteAndNextTurn() }
         findViewById<Button>(R.id.btn_undo).setOnClickListener { undoLastAction() }
@@ -415,16 +426,28 @@ class BiljardGame : AppCompatActivity() {
         val p1CurrentTotal = player1TotalCar + (if (isPlayer1Turn) currentTurnCar else 0)
         val p2CurrentTotal = player2TotalCar + (if (!isPlayer1Turn) currentTurnCar else 0)
 
-        tvP1Points.text = calculatePoints(p1CurrentTotal, p1TMC).toString()
-        tvP2Points.text = calculatePoints(p2CurrentTotal, p2TMC).toString()
-
         val activeTmc = if (isPlayer1Turn) p1TMC else p2TMC
         val activeTotal = if (isPlayer1Turn) p1CurrentTotal else p2CurrentTotal
-        val remaining = calculateRemainingForNextPoint(activeTotal, activeTmc)
 
-        // FIX: Geef 'remaining' door als getal (Int) en NIET als tekst (String)
-        // Omdat strings.xml een getal verwacht (%1$d)
-        tvRemaining.text = getString(R.string.remaining_format, remaining)
+        if (isFixedTurns) {
+            tvP1Points.text = calculatePoints(p1CurrentTotal, p1TMC).toString()
+            tvP2Points.text = calculatePoints(p2CurrentTotal, p2TMC).toString()
+            val pointsLabel = getString(R.string.points)
+            findViewById<TextView>(R.id.tv_p1_points_label).text = pointsLabel
+            findViewById<TextView>(R.id.tv_p2_points_label).text = pointsLabel
+
+            // 'remaining' wordt als getal (Int) doorgegeven, want strings.xml verwacht %1$d
+            tvRemaining.text = getString(R.string.remaining_format, calculateRemainingForNextPoint(activeTotal, activeTmc))
+        } else {
+            // Uit is uit: percentage van het te maken aantal en het aantal caramboles dat nog nodig is.
+            tvP1Points.text = "${calculatePercentage(p1CurrentTotal, p1TMC)}%"
+            tvP2Points.text = "${calculatePercentage(p2CurrentTotal, p2TMC)}%"
+            val percentageLabel = getString(R.string.percentage)
+            findViewById<TextView>(R.id.tv_p1_points_label).text = percentageLabel
+            findViewById<TextView>(R.id.tv_p2_points_label).text = percentageLabel
+
+            tvRemaining.text = getString(R.string.remaining_format_until_out, calculateRemainingToFinish(activeTotal, activeTmc))
+        }
 
         tvActivePlayerName.text = if (isPlayer1Turn) p1Name else p2Name
 
@@ -437,9 +460,39 @@ class BiljardGame : AppCompatActivity() {
         }
     }
 
+    // Aantal beurten dat een speler heeft gespeeld. Een onthouden tussenstand na Undo telt niet mee.
+    // Bij een tijdelijk overzicht telt de beurt die nu loopt mee, want die caramboles staan ook in het totaal.
+    private fun playedTurns(player1: Boolean, includeCurrentTurn: Boolean = false): Int {
+        val noted = turnHistory.count { (if (player1) it.p1Noted() else it.p2Noted()) != null }
+        return noted + if (includeCurrentTurn && isPlayer1Turn == player1) 1 else 0
+    }
+
+    // Moyenne = caramboles gedeeld door beurten, met drie decimalen en een komma (voor Excel).
+    private fun formatMoyenne(car: Int, turns: Int): String =
+        if (turns <= 0) "-" else String.format(Locale("nl", "NL"), "%.3f", car.toDouble() / turns)
+
+    // In het CSV-bestand als tekstformule, zodat een spreadsheet met een Engelse taalinstelling "0,333" niet
+    // leest als duizendtal (333).
+    private fun formatMoyenneCsv(car: Int, turns: Int): String {
+        val moyenne = formatMoyenne(car, turns)
+        return if (turns <= 0) moyenne else "=\"$moyenne\""
+    }
+
     private fun calculatePoints(car: Int, tmc: Double): Int {
         if (tmc <= 0) return 0
         return (car / (tmc / 10.0)).toInt() //.coerceAtMost(10)
+    }
+
+    // Uit is uit: percentage van het te maken aantal (TMC), naar beneden afgerond.
+    // 100 procent is gelijk aan 10 punten, dus de wedstrijd eindigt op hetzelfde moment.
+    private fun calculatePercentage(car: Int, tmc: Double): Int {
+        if (tmc <= 0) return 0
+        return (car * 100.0 / tmc).toInt()
+    }
+
+    // Uit is uit: aantal caramboles dat de speler nog nodig heeft om uit te zijn.
+    private fun calculateRemainingToFinish(car: Int, tmc: Double): Int {
+        return ceil(tmc - car).toInt().coerceAtLeast(0)
     }
 
     private fun calculateRemainingForNextPoint(car: Int, tmc: Double): Int {
@@ -674,7 +727,9 @@ class BiljardGame : AppCompatActivity() {
                 
                 out.write("\n")
                 out.write("${p1Name} totaal caramboles;${player1TotalCar}\n")
-                out.write("${p2Name} totaal caramboles;${player2TotalCar}\n\n")
+                out.write("${p2Name} totaal caramboles;${player2TotalCar}\n")
+                out.write("${p1Name} moyenne;${formatMoyenneCsv(player1TotalCar, playedTurns(true))}\n")
+                out.write("${p2Name} moyenne;${formatMoyenneCsv(player2TotalCar, playedTurns(false))}\n\n")
                 
                 val p1TimeStr = String.format("%02d:%02d:%02d", p1PlayTime / 3600, (p1PlayTime % 3600) / 60, p1PlayTime % 60)
                 val p2TimeStr = String.format("%02d:%02d:%02d", p2PlayTime / 3600, (p2PlayTime % 3600) / 60, p2PlayTime % 60)
@@ -732,6 +787,7 @@ class BiljardGame : AppCompatActivity() {
     private fun finishGame(reason: String) {
         matchFinished = true
         handler.removeCallbacks(timerRunnable)
+        saveGameState(finished = true)
         updateUI()
         sendBluetoothMatchMessage("match_finished")
         showMatchSummaryDialog(reason)
@@ -755,6 +811,7 @@ class BiljardGame : AppCompatActivity() {
         sb.append("SPELER 1: $p1Name\n")
         sb.append("TMC: ${p1TMC.toInt()}\n")
         sb.append("Totaal Caramboles: $p1Total\n")
+        sb.append("Moyenne: ${formatMoyenne(p1Total, playedTurns(true, includeCurrentTurn))}\n")
         sb.append("Punten: ${calculatePoints(p1Total, p1TMC)}\n")
         val p1TimeStr = String.format("%02d:%02d:%02d", p1PlayTime / 3600, (p1PlayTime % 3600) / 60, p1PlayTime % 60)
         sb.append("Speeltijd: $p1TimeStr\n\n")
@@ -762,6 +819,7 @@ class BiljardGame : AppCompatActivity() {
         sb.append("SPELER 2: $p2Name\n")
         sb.append("TMC: ${p2TMC.toInt()}\n")
         sb.append("Totaal Caramboles: $p2Total\n")
+        sb.append("Moyenne: ${formatMoyenne(p2Total, playedTurns(false, includeCurrentTurn))}\n")
         sb.append("Punten: ${calculatePoints(p2Total, p2TMC)}\n")
         val p2TimeStr = String.format("%02d:%02d:%02d", p2PlayTime / 3600, (p2PlayTime % 3600) / 60, p2PlayTime % 60)
         sb.append("Speeltijd: $p2TimeStr\n\n")
@@ -845,10 +903,8 @@ class BiljardGame : AppCompatActivity() {
             .setPositiveButton("Verzenden & Sluiten") { _, _ ->
                 returnToMainAfterShare = true
                 saveMatchToCsv(true, reason)
-                clearSavedState()
             }
             .setNegativeButton("Alleen Sluiten") { _, _ ->
-                clearSavedState()
                 returnToMainMenu()
             }
             .setCancelable(true)

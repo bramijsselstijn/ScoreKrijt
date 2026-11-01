@@ -1,4 +1,4 @@
-# Hulpfuncties voor het genereren van de SK-Box-handleidingen (.docx) zonder Word of Python.
+﻿# Hulpfuncties voor het genereren van de SK-Box-handleidingen (.docx) zonder Word of Python.
 # Gebruik: . .\skbox_docgen.ps1 ; Start-Doc ; ... ; Save-Doc -Path ... -HeaderText ... -FooterText ...
 
 Add-Type -AssemblyName System.IO.Compression
@@ -46,6 +46,8 @@ function Inline([string]$text) {
 function Para([string]$text, [string]$style, [string]$ppr) {
     $s = ''
     if ($style) { $s = "<w:pStyle w:val='$style'/>" }
+    # Een zin die op een dubbele punt eindigt hoort bij het blok eronder.
+    if ($text.TrimEnd().EndsWith(':')) { $s += '<w:keepNext/>' }
     Add-Xml "<w:p><w:pPr>$s$ppr</w:pPr>$(Inline $text)</w:p>"
 }
 
@@ -78,7 +80,7 @@ function Check([string]$t) {
 }
 
 function CodeBlock([string]$code) {
-    $lines = $code.Trim("`r", "`n").Split("`n") | ForEach-Object { $_.TrimEnd("`r") }
+    $lines = @($code.Trim("`r", "`n").Split("`n") | ForEach-Object { $_.TrimEnd("`r") })
     for ($i = 0; $i -lt $lines.Count; $i++) {
         $kn = ''
         if ($i -lt $lines.Count - 1) { $kn = '<w:keepNext/>' }
@@ -88,9 +90,9 @@ function CodeBlock([string]$code) {
 }
 
 function Callout([string]$kind, [string]$title, [string]$text) {
-    $bar = $script:Blue; $fill = 'EAF1F6'
-    if ($kind -eq 'warn') { $bar = $script:Gold; $fill = 'FFF6DC' }
-    if ($kind -eq 'ok') { $bar = '2E7D5B'; $fill = 'E8F4EE' }
+    $bar = $script:Blue; $fill = 'EAF1F6'; $ink = $script:Blue
+    if ($kind -eq 'warn') { $bar = $script:Gold; $fill = 'FFF6DC'; $ink = '8A5A00' }
+    if ($kind -eq 'ok') { $bar = '2E7D5B'; $fill = 'E8F4EE'; $ink = '1F5C42' }
     $w = $script:Width
     Add-Xml ("<w:tbl><w:tblPr><w:tblW w:w='$w' w:type='dxa'/>" +
         "<w:tblBorders><w:left w:val='single' w:sz='36' w:space='0' w:color='$bar'/></w:tblBorders>" +
@@ -98,7 +100,7 @@ function Callout([string]$kind, [string]$title, [string]$text) {
         "<w:tblCellMar><w:top w:w='110' w:type='dxa'/><w:left w:w='200' w:type='dxa'/><w:bottom w:w='110' w:type='dxa'/><w:right w:w='200' w:type='dxa'/></w:tblCellMar>" +
         "</w:tblPr><w:tblGrid><w:gridCol w:w='$w'/></w:tblGrid>" +
         "<w:tr><w:trPr><w:cantSplit/></w:trPr><w:tc><w:tcPr><w:tcW w:w='$w' w:type='dxa'/><w:shd w:val='clear' w:color='auto' w:fill='$fill'/></w:tcPr>" +
-        "<w:p><w:pPr><w:pStyle w:val='TableText'/></w:pPr>$(Run $title "<w:b/><w:color w:val='$bar'/>")$(Run '  ' '')$(Inline $text)</w:p>" +
+        "<w:p><w:pPr><w:pStyle w:val='TableText'/></w:pPr>$(Run $title "<w:b/><w:color w:val='$ink'/>")$(Run '  ' '')$(Inline $text)</w:p>" +
         "</w:tc></w:tr></w:tbl>")
     Spacer
 }
@@ -134,7 +136,7 @@ function Tbl([string[]]$headers, [object[]]$rows, [int[]]$widths) {
 }
 
 function Cover([string]$label, [string]$title, [string]$subtitle, [string]$meta, [string]$logoPath) {
-    Add-Xml "<w:p><w:pPr><w:spacing w:before='1500' w:after='0'/></w:pPr></w:p>"
+    Add-Xml "<w:p><w:pPr><w:spacing w:before='2600' w:after='0'/></w:pPr></w:p>"
     if (Test-Path $logoPath) {
         $e = 1371600
         Add-Xml ("<w:p><w:pPr><w:jc w:val='center'/><w:spacing w:after='360'/></w:pPr><w:r><w:drawing><wp:inline distT='0' distB='0' distL='0' distR='0'>" +
@@ -151,6 +153,7 @@ function Cover([string]$label, [string]$title, [string]$subtitle, [string]$meta,
     Para $subtitle 'CoverSubtitle'
     Add-Xml "<w:p><w:pPr><w:pBdr><w:bottom w:val='single' w:sz='12' w:space='1' w:color='$script:Gold'/></w:pBdr><w:spacing w:after='240'/><w:ind w:left='3300' w:right='3300'/></w:pPr></w:p>"
     Para $meta 'CoverMeta'
+    Para 'ScoreKrijt en deze handleiding zijn gemaakt met behulp van AI.' 'CoverMeta'
     PageBreak
 }
 

@@ -5,6 +5,9 @@ Created on Sat Apr 13 10:33:42 2024
 @author: BramI
 """
 
+import os
+import shutil
+import subprocess
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -89,6 +92,7 @@ class Application(tk.Tk):
         self.bind('<Control-N>', self.new_match)
         
         self.bind('<Return>', self.note_and_next_turn)
+        self.bind('<F12>', lambda event: self.toggle_taskbar())
         self.bind('p', self.increment_current_car)
         self.bind('+', self.increment_current_car)
         self.bind('-', self.decrement_current_car)
@@ -115,12 +119,25 @@ class Application(tk.Tk):
         
             self.toggle_big_screen()
         
+        # Laat de launcher weten dat het scorebord klaar is, zodat het opstartscherm sluit.
+        # Dit staat vóór de controles hieronder: die kunnen een vraagvenster tonen.
+        ready_file = os.environ.get("SCOREKRIJT_READY_FILE")
+        if ready_file:
+            self.after(2000, lambda: self._signal_ready(ready_file))
+
         # Check previous matches
         if self.settings['CleanupOldMatches'].get():
             self.logica.cleanup_old_matches(years=int(self.settings['YearOfOldMatchesDeleted'].get()))
         
         if self.settings['CheckPreviousMatches'].get():
             self.logica.check_open_matches()
+
+    def _signal_ready(self, path):
+        try:
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write("ready")
+        except OSError:
+            pass
         
         
         
@@ -329,6 +346,49 @@ class Application(tk.Tk):
         if self.big_screen:
             self.big_screen.update_turns()
         
+    def _keep_big_screen_fullscreen(self, delays_ms=(300, 1500, 3000, 5500, 7000)):
+        """Vraag volledig scherm na het opstarten een paar keer opnieuw aan.
+
+        Een verzoek op het moment dat het venster net is gemaakt wordt op de
+        SK-Box (Wayland/labwc) soms genegeerd, zeker als het hoofdvenster
+        verborgen is en het opstartscherm van de launcher er nog overheen ligt.
+        """
+        def apply():
+            screen = self.big_screen
+            if screen is None or not screen.winfo_exists():
+                return
+            if self.settings['OpenBigScreenFullScreen'].get():
+                screen.attributes("-fullscreen", True)
+
+        for delay in delays_ms:
+            self.after(delay, apply)
+
+    def toggle_taskbar(self):
+        """F12 op de SK-Box: taakbalk tonen of verbergen (Raspberry Pi OS, labwc).
+
+        Werkt met het grote scherm open (F12 in dat scherm) en zonder groot scherm (F12 in het
+        gewone venster). Tonen: een groot scherm gaat uit volledig scherm en de taakbalk wordt
+        gestart. Verbergen: de taakbalk stopt en een groot scherm vult weer het scherm.
+        """
+        panel = shutil.which("wf-panel-pi")
+        if not panel:
+            return
+        screen = self.big_screen
+        if screen is not None and not screen.winfo_exists():
+            screen = None
+        running = subprocess.run(["pgrep", "-x", "wf-panel-pi"],
+                                 stdout=subprocess.DEVNULL).returncode == 0
+        if running:
+            subprocess.run(["pkill", "-x", "wf-panel-pi"])
+            if screen is not None and self.settings['OpenBigScreenFullScreen'].get():
+                screen.attributes("-fullscreen", True)
+                self._keep_big_screen_fullscreen()
+        else:
+            if screen is not None:
+                screen.attributes("-fullscreen", False)
+            subprocess.Popen([panel], start_new_session=True,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
     def toggle_big_screen(self, event=None):
 
         # AAN â†’ openen
@@ -336,7 +396,9 @@ class Application(tk.Tk):
             self.big_screen = v.BigScreenView(parent=self, variables=self.variables, settings=self.settings, app_service=self.app_service)
                         
             if self.settings['OpenBigScreenFullScreen'].get():
+                self.big_screen.update_idletasks()
                 self.big_screen.attributes("-fullscreen", True)
+                self._keep_big_screen_fullscreen()
 
         # UIT â†’ sluiten
         else:
@@ -370,6 +432,9 @@ class Application(tk.Tk):
             elif cmd == "ping":
                 self.send_bluetooth_event("pong")
     
+            elif cmd == "prepare_match":
+                self.prepare_match_from_phone(msg)
+
             elif cmd == "start_new_match":
                 self.start_match_from_phone(msg)
     
@@ -412,6 +477,7 @@ class Application(tk.Tk):
     DISPLAY_SETTING_KEYS = {
         "show_history": "BS history",
         "history_rows": "BS Number of history rows",
+        "middle_width_percent": "BS Mid col. width percent",
         "player_name_size": "BS PlayerName fs",
         "score_text_size": "BS InfoCarText fs",
         "score_value_size": "BS InfoCarValue fs",
@@ -558,6 +624,54 @@ class Application(tk.Tk):
             return
         self.send_connection_match_status()
     
+    def prepare_match_from_phone(self, msg):
+        """Toon namen en TMC op de SK-Box terwijl de telefoon de aanvang van de wedstrijd bepaalt.
+
+        Er wordt geen wedstrijd gestart (geen timer, geen wedstrijdbestand). Een wedstrijd die
+        loopt (Turn > 0) wordt nooit aangeraakt."""
+        v = self.variables
+        if v["Turn"].get() > 0:
+            self.send_bluetooth_event("match_prepare_ignored", {"reason": "match_running"})
+            return
+
+        player1 = str(msg["player1"]).strip()
+        player2 = str(msg["player2"]).strip()
+        player1_tmc = int(msg["player1_tmc"])
+        player2_tmc = int(msg["player2_tmc"])
+        if not player1 or not player2:
+            raise ValueError("Beide spelersnamen zijn verplicht")
+        if player1_tmc <= 0 or player2_tmc <= 0:
+            raise ValueError("TMC moet groter dan nul zijn")
+
+        v["Player1"].set(player1[:14])
+        v["Player2"].set(player2[:14])
+        v["Player1TMC"].set(player1_tmc)
+        v["Player2TMC"].set(player2_tmc)
+
+        if "game_type" in msg:
+            self.settings["GameType"].set(msg["game_type"])
+        if "game_turns" in msg and int(msg["game_turns"]) > 0:
+            self.settings["GameTurns"].set(int(msg["game_turns"]))
+
+        # Een leeg bord laten zien, ook als er nog een afgeronde wedstrijd stond.
+        for name in ("Player1Car", "Player2Car", "CurrentCar", "Player1Points", "Player2Points",
+                     "Player1HighestSerie", "Player2HighestSerie"):
+            v[name].set(0)
+        v["CurrentPlayerName"].set(v["Player1"].get())
+        v["points_and_turns"].clear()
+
+        # Nog niet bepaald wie begint: alle bovenste vakken wit. De kleuren en de actieve speler
+        # komen pas bij het starten van de wedstrijd (start_match_from_phone).
+        v["Player1BackGroundColor"].set("White")
+        v["Player2BackGroundColor"].set("White")
+        self.appInfoScreen.update_full_player_color(v)
+        if self.big_screen:
+            self.big_screen.update_full_player_color(v)
+        self.logica.cal_both_points()
+        self.logica.cal_car_to_next_point()
+        self.update_big_screen_turns()
+        self.send_bluetooth_event("match_prepared")
+
     def start_match_from_phone(self, msg):
         try:
             player1 = str(msg["player1"]).strip()

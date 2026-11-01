@@ -1,13 +1,14 @@
-# ScoreKrijt-roadmap V2.9 t/m V3.1
+# ScoreKrijt-roadmap V2.8.8 t/m V3.1
 
 **Status:** gepland
 
-**Laatst bijgewerkt:** 4 september 2026
+**Laatst bijgewerkt:** 29 oktober 2026
 
-V2.8 is functioneel en praktisch getest. Deze roadmap verdeelt de volgende uitbreidingen over vier afzonderlijke releases. Afgeronde onderdelen worden na implementatie en controle naar `CHANGELOG.md` verplaatst.
+V2.8.7 is voltooid en praktisch getest. Deze roadmap verdeelt de volgende uitbreidingen over vijf afzonderlijke releases. Afgeronde onderdelen worden na implementatie en controle naar `CHANGELOG.md` verplaatst.
 
 ## Release-indeling
 
+- **V2.8.8:** moyenne correct in het CSV-wedstrijdbestand en het laatst gespeelde spel onthouden in de telefoonapp.
 - **V2.9:** uitsluitend de spelsoort `10 over rood`, inclusief bediening op telefoon en SK-Box.
 - **V2.9.5:** de spelsoort `Honderden`, voortbouwend op de meerspelersbasis van V2.9.
 - **V3.0:** competities instellen via de telefoon en blijvend opslaan en volgen op de SK-Box.
@@ -84,6 +85,38 @@ Vanuit het keuzemenu kan de gebruiker naar:
 - terug-, annuleer- en bevestigingsroutes;
 - foutmeldingen, verbinding verbroken en opnieuw verbinden;
 - einde wedstrijd, klassering en terugkeer naar het hoofdmenu.
+
+## V2.8.8 – Moyenne in CSV en laatst gespeelde spel onthouden
+
+**Van toepassing op:** SK-Box (CSV-wedstrijdbestand) en de Android-telefoonapp.
+
+### Moyenne correct in het CSV-bestand
+
+**Wat gaan we toepassen:**  
+Het CSV-wedstrijdbestand krijgt de moyenne zo opgeslagen dat de waarde bij openen correct wordt weergegeven. Nu staat er bij een gespeelde moyenne van `0.333` in het bestand of na openen `333`; de decimale scheiding gaat dus verloren.
+
+- de moyenne wordt per speler in het CSV-bestand opgenomen;
+- de moyenne wordt altijd met drie decimalen geschreven, bijvoorbeeld `0,333`;
+- de waarde wordt bij openen in een Nederlandstalig spreadsheetprogramma (zoals Excel) als getal `0,333` gelezen en niet als `333`;
+- het scheidingsteken tussen kolommen botst niet met het decimale teken;
+- hervatten van een wedstrijd vanuit het CSV-bestand blijft werken.
+
+**Waarom:**  
+Zo kloppen de moyennes wanneer wedstrijdverslagen worden bekeken of verder verwerkt, zonder handmatige correctie.
+
+### Laatst gespeelde spel onthouden in de telefoonapp
+
+**Wat gaan we toepassen:**  
+De telefoonapp onthoudt het laatst gespeelde spel totdat er een nieuw spel wordt gestart. Ook na afloop van de wedstrijd, na het sluiten van de app of na het verbreken van de Bluetoothverbinding blijft deze wedstrijd beschikbaar.
+
+- na afloop kan de laatst gespeelde wedstrijd vanuit de app opnieuw worden geopend;
+- in de laatst gespeelde wedstrijd kunnen nog wijzigingen worden gemaakt, zoals een verkeerd ingevoerde beurt of score corrigeren;
+- wijzigingen worden naar de SK-Box gestuurd, zodat het CSV-bestand en het grote scherm worden bijgewerkt;
+- de onthouden wedstrijd wordt pas vervangen wanneer een nieuw spel wordt gestart;
+- vóór het starten van een nieuw spel is duidelijk dat de vorige wedstrijd daarna niet meer via deze functie kan worden gewijzigd.
+
+**Waarom:**  
+Fouten die pas na afloop worden opgemerkt, kunnen zo nog worden hersteld zonder de wedstrijd opnieuw te spelen of het bestand handmatig aan te passen.
 
 ## V2.9 – Spelsoort `10 over rood`
 
@@ -669,7 +702,7 @@ Iedere mijlpaal levert een afzonderlijk werkende en testbare tussenversie op. Be
 
 **Status:** gepland
 
-- voer deze mijlpaal afzonderlijk uit vóór vrijgave van V2.9, V2.9.5, V3.0 en V3.1;
+- voer deze mijlpaal afzonderlijk uit vóór vrijgave van V2.8.8, V2.9, V2.9.5, V3.0 en V3.1;
 - test de functies van de betreffende release op de echte SK-Box en telefoon;
 - controleer bestaande spelsoorten en alle V2.8-functies;
 - controleer competitieopslag, bestaande hervatfuncties, Bluetooth en bestaande wedstrijdverslagen;

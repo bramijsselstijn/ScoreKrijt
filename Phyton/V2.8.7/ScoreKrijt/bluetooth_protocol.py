@@ -18,6 +18,7 @@ class BluetoothProtocol:
         "ping",
         "status",
         "start_new_match",
+        "prepare_match",
         "update_match",
         "score_plus",
         "score_minus",

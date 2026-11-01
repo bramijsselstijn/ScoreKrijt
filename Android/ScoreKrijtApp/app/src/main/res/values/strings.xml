@@ -3,6 +3,7 @@
     <string name="TitleTextView">ScoreKrijt</string>
     <string name="EnkelSpelKnop">Enkel Spel</string>
     <string name="ResumeGameKnop">Hervat Wedstrijd</string>
+    <string name="ReopenLastGameKnop">Laatste wedstrijd openen</string>
     <string name="EnkelSpelOpstartenText">Enkel Spel Opstarten</string>
     <string name="Speler1TitleText">Speler 1</string>
     <string name="NaamSpelerText">Naam speler</string>
@@ -25,11 +26,13 @@
     <string name="start_time_label">Startijd %1$s</string>
     <string name="settings_label">Instellingen</string>
     <string name="remaining_format">En nog %1$d tot volgend punt</string>
+    <string name="remaining_format_until_out">En nog %1$d</string>
     <string name="zero">0</string>
     <string name="caramboles">Caramboles</string>
     <string name="inning">Beurt</string>
     <string name="tmc">TMC</string>
     <string name="points">Punten</string>
+    <string name="percentage">Procent</string>
     <string name="placeholder_score">##</string>
     <string name="this_turn">Deze beurt</string>
     <string name="player1_default">Speler 1</string>
@@ -93,7 +96,7 @@
 
     <string name="help_content_vastliggen_driebanden">Vastliggen met driebanden\n\nBij driebanden heeft de speler bij vastliggende ballen de volgende keuze mogelijkheden:\n\n1. Spelen via de niet vastliggende bal of via een of meer andere banden dan de vastliggende band;\n2. Losspelen van zijn speelbal via een \"kopstoot\";\n3. Het op de acquits laten leggen van de speelbal en de vastliggende bal. Eventueel alle ballen, als de speelbal tegen beide andere ballen vastligt en wel als volgt:\n   a. de rode bal op het bovenacquit\n   b. de speelbal op het benedenacquit\n   c. de andere bal op het middenacquit\n\nIndien het voor de vastliggende bal aangewezen acquit bezet is of versperd wordt, dan wordt die bal geplaatst op het acquit van de bal die het acquit verspert.</string>
 
-    <string name="help_about_content">Score Krijt\n\nby Bram IJsselstijn\nFor more info read the manual.\nNote: there is no manual.</string>
+    <string name="help_about_content">Score Krijt\n\nby Bram IJsselstijn\nFor more info read the manual.\nNote: there is no manual.\n\nDeze app is gemaakt met behulp van AI (Claude van Anthropic).\nThis app was made with the help of AI (Claude by Anthropic).</string>
 
     <string name="help_common_help_content">Score Krijt Help\n\nContact support if you cannot find the manual.\nAlso do not contact the writer of this program.\nHe is a noob at this stupid game ;).\n\nSpecial thanks to \"Biljartvereniging de Musketier\", and \"Het gebouw, Ammerstol\" for testing\n\nRules found on:\nhttps://www.bcraalte.nl/informatie/biljart-regels\n1-2025</string>
 </resources>

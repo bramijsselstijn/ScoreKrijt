@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import org.json.JSONObject
 
 class BepalenAanvangWedstrijd : AppCompatActivity() {
 
@@ -72,8 +73,26 @@ class BepalenAanvangWedstrijd : AppCompatActivity() {
 
         // Check for resume
         val statePrefs = getSharedPreferences("ScoreKrijtState", MODE_PRIVATE)
-        val inProgress = statePrefs.getBoolean("GAME_IN_PROGRESS", false)
+        // Een afgeronde wedstrijd (alleen nog te heropenen vanuit het hoofdmenu) telt hier niet mee.
+        val inProgress = statePrefs.getBoolean("GAME_IN_PROGRESS", false) &&
+            !statePrefs.getBoolean("GAME_FINISHED", false)
         btnResumeMatch.visibility = if (inProgress) View.VISIBLE else View.GONE
+
+        // Laat de namen en TMC alvast op de SK-Box zien. Een wedstrijd die op de SK-Box loopt blijft
+        // ongemoeid: de SK-Box negeert dit bericht dan zelf. Een oudere SK-Box kent het commando niet
+        // en antwoordt met een melding die hier niet wordt getoond.
+        if (ScoreKrijtBluetoothBox.isConnected()) {
+            ScoreKrijtBluetoothBox.send(
+                JSONObject()
+                    .put("cmd", "prepare_match")
+                    .put("player1", p1Name)
+                    .put("player2", p2Name)
+                    .put("player1_tmc", p1TMC)
+                    .put("player2_tmc", p2TMC)
+                    .put("game_type", if (isFixedTurns) "Vaste beurten" else "Uit is uit")
+                    .put("game_turns", numTurns)
+            )
+        }
 
         btnResumeMatch.setOnClickListener {
             val intentResume = android.content.Intent(this, BiljardGame::class.java).apply {

@@ -154,7 +154,7 @@ class ScoreKrijtBluetoothClient(
         send(JSONObject()
             .put("cmd", "hello")
             .put("app", "ScoreKrijt Android")
-            .put("app_version", "2.8.5")
+            .put("app_version", "2.8.8")
             .put("protocol_version", PROTOCOL_VERSION))
     }
 

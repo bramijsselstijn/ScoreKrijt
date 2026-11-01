@@ -38,23 +38,23 @@ class SettingsModel:
         'Maximum TMC Value':        {'type': 'int'  , 'value': 999              , 'default': 999     , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':'Minimum TMC Value', 'max':999},
         'Minimum TMC Value':        {'type': 'int'  , 'value': 6                , 'default': 6       , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':0,  'max':'Maximum TMC Value'},
         'Minimum Turns Value':      {'type': 'int'  , 'value': 10               , 'default': 10      , 'menutype':'Spinbox', 'SpinboxInterval': 5, 'Min':10, 'max':150},
-        'BS Mid col. width divider':{'type': 'int'  , 'value': 5                , 'default': 5       , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':2,  'max':7    , 'category': 'Big Screen'},
-        'BS PlayerName fs':         {'type': 'int'  , 'value': 70               , 'default': 70      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':120  , 'category': 'Big Screen'},
-        'BS TMCText fs':            {'type': 'int'  , 'value': 28               , 'default': 28      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':60   , 'category': 'Big Screen'},
-        'BS TMCValue fs':           {'type': 'int'  , 'value': 42               , 'default': 42      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':15, 'max':90   , 'category': 'Big Screen'},
-        'BS TurnText font size':    {'type': 'int'  , 'value': 70               , 'default': 70      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':50, 'max':90   , 'category': 'Big Screen'},
-        'BS TurnValue font size':   {'type': 'int'  , 'value': 100              , 'default': 100     , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':50, 'max':150  , 'category': 'Big Screen'},
-        'BS CurrentCarText fs':     {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':80   , 'category': 'Big Screen'},
-        'BS CurrentCarValue fs':    {'type': 'int'  , 'value': 60               , 'default': 60      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':40, 'max':80   , 'category': 'Big Screen'},
+        'BS Mid col. width percent':{'type': 'int'  , 'value': 20               , 'default': 20      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':60   , 'category': 'Big Screen'},
+        'BS PlayerName fs':         {'type': 'int'  , 'value': 70               , 'default': 70      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':200  , 'category': 'Big Screen'},
+        'BS TMCText fs':            {'type': 'int'  , 'value': 28               , 'default': 28      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':120   , 'category': 'Big Screen'},
+        'BS TMCValue fs':           {'type': 'int'  , 'value': 42               , 'default': 42      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':15, 'max':180   , 'category': 'Big Screen'},
+        'BS TurnText font size':    {'type': 'int'  , 'value': 70               , 'default': 70      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':50, 'max':160   , 'category': 'Big Screen'},
+        'BS TurnValue font size':   {'type': 'int'  , 'value': 100              , 'default': 100     , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':50, 'max':300  , 'category': 'Big Screen'},
+        'BS CurrentCarText fs':     {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':160   , 'category': 'Big Screen'},
+        'BS CurrentCarValue fs':    {'type': 'int'  , 'value': 60               , 'default': 60      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':40, 'max':200   , 'category': 'Big Screen'},
         'BS Number of history rows':{'type': 'int'  , 'value': 3                , 'default': 3       , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':1,  'max':10   , 'category': 'Big Screen'},
-        'BS HistoryText fs':        {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':50   , 'category': 'Big Screen'},
-        'BS HistoryValue fs':       {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':50   , 'category': 'Big Screen'},
-        'BS InfoCarText fs':        {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':80   , 'category': 'Big Screen'},
-        'BS InfoCarValue fs':       {'type': 'int'  , 'value': 200              , 'default': 200     , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':120, 'max':280 , 'category': 'Big Screen'},
-        'BS StatsText fs':          {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':50   , 'category': 'Big Screen'},
-        'BS StatsValue fs':         {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':80   , 'category': 'Big Screen'},
-        'BS PointsText fs':         {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':50   , 'category': 'Big Screen'},
-        'BS PointsValue fs':        {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':80   , 'category': 'Big Screen'},
+        'BS HistoryText fs':        {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':100   , 'category': 'Big Screen'},
+        'BS HistoryValue fs':       {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':100   , 'category': 'Big Screen'},
+        'BS InfoCarText fs':        {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':160   , 'category': 'Big Screen'},
+        'BS InfoCarValue fs':       {'type': 'int'  , 'value': 200              , 'default': 200     , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':120, 'max':500 , 'category': 'Big Screen'},
+        'BS StatsText fs':          {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':100   , 'category': 'Big Screen'},
+        'BS StatsValue fs':         {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':160   , 'category': 'Big Screen'},
+        'BS PointsText fs':         {'type': 'int'  , 'value': 30               , 'default': 30      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':10, 'max':100   , 'category': 'Big Screen'},
+        'BS PointsValue fs':        {'type': 'int'  , 'value': 50               , 'default': 50      , 'menutype':'Spinbox', 'SpinboxInterval': 1, 'Min':20, 'max':160   , 'category': 'Big Screen'},
         'SenderMail':               {'type': 'str'  , 'value': '' , 'default': ''      , 'menutype':'Entry' , 'category': 'E-Mail'},
         'MailAppPassword':          {'type': 'str'  , 'value': ''  , 'default': ''      , 'menutype':'Entry' , 'category': 'E-Mail'},
         
@@ -82,6 +82,17 @@ class SettingsModel:
             if key in raw_values and 'value' in raw_values[key]:
                 raw_value = raw_values[key]['value']
                 self.variables[key]['value'] = raw_value
+
+        # Oudere versies bewaarden de breedte van de middelste kolom als deler
+        # (5 = een vijfde). Neem die over als percentage.
+        percent = self.variables['BS Mid col. width percent']
+        old_divider = raw_values.get('BS Mid col. width divider')
+        if 'BS Mid col. width percent' not in raw_values and isinstance(old_divider, dict):
+            try:
+                converted = round(100 / int(old_divider['value']))
+                percent['value'] = max(percent['Min'], min(percent['max'], converted))
+            except (KeyError, ValueError, TypeError, ZeroDivisionError):
+                pass
     
     def save(self, settings=None):
         #json_string = json.dump(self.variables)

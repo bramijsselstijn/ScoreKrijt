@@ -123,7 +123,7 @@ class MainMenu(Menu):
         messagebox.showinfo(
             title='About', 
             message='Score Krijt', 
-            detail='by Bram IJsselstijn\nFor more info read the manual.\nNote: there is no manual.'
+            detail='by Bram IJsselstijn\nFor more info read the manual.\nNote: there is no manual.\n\nDeze software is gemaakt met behulp van AI (Claude van Anthropic).\nThis software was made with the help of AI (Claude by Anthropic).'
         )
 
     def show_help(self):

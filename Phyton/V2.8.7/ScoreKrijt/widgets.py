@@ -5,6 +5,7 @@ Created on Sat Apr 13 10:33:42 2024
 @author: BramI
 """
 
+import math
 import tkinter as tk
 import tkinter.font as tkfont
 
@@ -501,14 +502,16 @@ class BSInfoFrame(tk.Frame):
         self.info["CarToPointText"].grid(row=0, column=2, sticky="nsew")
 
         # Dynamic labels
-        if self.playerName == self.variables["Player1"].get():
-            self.info["HighStreakInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player1HighestSerie"])
-            self.info["PointsInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player1Points"])
-            self.info["CarToPointInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player1CarToNextPoint"])
-        else:
-            self.info["HighStreakInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player2HighestSerie"])
-            self.info["PointsInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player2Points"])
-            self.info["CarToPointInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables["Player2CarToNextPoint"])
+        self._prefix = "Player1" if self.playerName == self.variables["Player1"].get() else "Player2"
+
+        # Punten en caramboles tot het volgende punt hangen af van de wedstrijdvorm
+        # (bij Uit is uit worden het procenten en caramboles tot uit); zie _refresh_progress.
+        self._points_var = tk.StringVar(self)
+        self._to_go_var = tk.StringVar(self)
+
+        self.info["HighStreakInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self.variables[f"{self._prefix}HighestSerie"])
+        self.info["PointsInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self._points_var)
+        self.info["CarToPointInt"] = tk.Label(self.infoFrame["PlayerStats"], textvariable=self._to_go_var)
 
         self.info["HighStreakInt"].configure(font=self.fonts["stats_var"], highlightbackground=CV.Colors.get("Black"), highlightthickness=2)
         self.info["HighStreakInt"].grid(row=1, column=0, sticky="nsew")
@@ -527,7 +530,62 @@ class BSInfoFrame(tk.Frame):
         # Registreer bij AppService
         if app_service:
             app_service.register_widget_for_font(self)
-        
+
+        self._watch_progress()
+
+
+    # -------------------------------------------------
+    # Punten of procenten
+    # -------------------------------------------------
+    def _watch_progress(self):
+        p = self._prefix
+        watched = [self.variables[name] for name in (
+            f"{p}Car", f"{p}TMC", f"{p}Points", f"{p}CarToNextPoint", "CurrentCar", "CurrentPlayerName"
+        )]
+        watched.append(self.settings["GameType"])
+
+        self._traces = [(var, var.trace_add("write", self._refresh_progress)) for var in watched]
+        self.bind("<Destroy>", self._stop_watching, add="+")
+        self._refresh_progress()
+
+    def _stop_watching(self, event):
+        if event.widget is not self:
+            return
+        for var, trace_id in getattr(self, "_traces", []):
+            try:
+                var.trace_remove("write", trace_id)
+            except Exception:
+                pass
+        self._traces = []
+
+    def _refresh_progress(self, *_):
+        """Bij vaste beurten: punten en caramboles tot het volgende punt.
+        Bij Uit is uit: percentage van het te maken aantal en caramboles tot uit."""
+        try:
+            if not self.winfo_exists():
+                return
+            p = self._prefix
+            if str(self.settings["GameType"].get()).strip().lower() == "uit is uit":
+                tmc = float(self.variables[f"{p}TMC"].get())
+                car = int(self.variables[f"{p}Car"].get())
+                if self.variables["CurrentPlayerName"].get() == self.variables[p].get():
+                    car += int(self.variables["CurrentCar"].get())   # lopende beurt telt direct mee
+                percentage = int(car * 100 / tmc) if tmc > 0 else 0
+                self._points_var.set(str(percentage))   # het kopje zegt al "Procent"
+                self._to_go_var.set(str(max(0, math.ceil(tmc - car))))
+                self.info["PointsText"].config(text="Procent")
+                self.info["CarToPointText"].config(text="Car. tot uit")
+            else:
+                self._points_var.set(str(self.variables[f"{p}Points"].get()))
+                self._to_go_var.set(str(self.variables[f"{p}CarToNextPoint"].get()))
+                self.info["PointsText"].config(text="Punten")
+                self.info["CarToPointText"].config(text="Car. tot punt")
+        except (tk.TclError, ValueError):
+            pass   # een variabele is tijdelijk leeg of het venster wordt net verwijderd
+        except Exception:
+            # Onverwachte fout: in het logboek zetten (scorekrijt-autostart.log) in plaats van stil te falen.
+            import traceback
+            traceback.print_exc()
 
     # -------------------------------------------------
     # Helpers
@@ -549,11 +607,11 @@ class BSInfoFrame(tk.Frame):
         actual_font = self._get_actual_font(font_key)
         for f in self.fonts.values():
             f.configure(family=actual_font)
-            
-        
-        
-        
-#App Turn Info            
+
+
+
+
+#App Turn Info          
 class TurnInfo(tk.Frame):
     """Widget die de huidige beurt toont."""
 

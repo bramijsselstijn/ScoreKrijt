@@ -194,7 +194,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Gelijkspel aan" />
+                    android:text="Gelijkspel aan&#10;(verlenging uit)" />
 
                 <RadioButton
                     android:id="@+id/radioButtonGelijkUit"
@@ -202,7 +202,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:checked="true"
-                    android:text="Gelijkspel uit" />
+                    android:text="Gelijkspel uit&#10;(verlenging aan)" />
             </RadioGroup>
 
             <com.google.android.material.textfield.TextInputLayout

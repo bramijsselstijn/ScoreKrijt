@@ -21,6 +21,36 @@
 
         <!-- Status Bar -->
         <item name="android:statusBarColor">@color/edit_green</item>
+
+        <!-- Knoppen: licht afgeronde hoeken in plaats van de standaard volledig ronde zijkanten -->
+        <item name="materialButtonStyle">@style/Widget.ScoreKrijt.Button</item>
+
+        <!-- Tekstknoppen in dialogen (Annuleren, Sluiten, OK): plat, maar met dezelfde hoeken -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.ScoreKrijt.AlertDialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.ScoreKrijt.AlertDialog</item>
+    </style>
+
+    <style name="ThemeOverlay.ScoreKrijt.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.ScoreKrijt.Button.Dialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.ScoreKrijt.Button.Dialog</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.ScoreKrijt.Button.Dialog</item>
+    </style>
+
+    <style name="Widget.ScoreKrijt.Button.Dialog" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="shapeAppearance">@style/ShapeAppearance.ScoreKrijt.Button</item>
+    </style>
+
+    <style name="ShapeAppearance.ScoreKrijt.Button" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">6dp</item>
+    </style>
+
+    <style name="Widget.ScoreKrijt.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.ScoreKrijt.Button</item>
+        <!-- Reliëf: schaduw in rust, ingedrukt bij aanraken, plus een dunne donkere rand -->
+        <item name="android:stateListAnimator">@animator/button_relief</item>
+        <item name="strokeColor">#40000000</item>
+        <item name="strokeWidth">1dp</item>
     </style>
 
     <style name="Theme.ScoreKrijtApp" parent="Base.Theme.ScoreKrijtApp" />

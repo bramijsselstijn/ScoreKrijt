@@ -378,6 +378,7 @@ class BigScreenView(tk.Toplevel):
         self.title("Score Krijt – Groot Scherm")
 
         self.bind("<F11>", self.toggle_fullscreen)
+        self.bind("<F12>", lambda e: parent.toggle_taskbar())
         self.bind("<Escape>", lambda e: self.close())
         self.protocol("WM_DELETE_WINDOW", self.close)
 
@@ -385,17 +386,25 @@ class BigScreenView(tk.Toplevel):
         font = self.settings['font']
         self.update_new_font(font)
         self.config(cursor="none")
-               
-        # Bind resize event
-        self.bind("<Configure>", self._on_resize)
+
+    def _middle_percent(self):
+        """Breedte van de middelste kolom in procenten van het scherm (10-60)."""
+        try:
+            percent = int(self.settings['BS Mid col. width percent'].get())
+        except (tk.TclError, ValueError):
+            percent = 20
+        return max(10, min(60, percent))
 
     # -------------------------------------------------
     # UI
     # -------------------------------------------------
     def _build_ui(self):
-        self.columnconfigure(0, weight=1, uniform="Player")
-        self.columnconfigure(1, weight=1)
-        self.columnconfigure(2, weight=1, uniform="Player")
+        # De kolombreedtes volgen de verhouding van de gewichten (uniform-groep):
+        # het middelste gewicht is het ingestelde percentage, de zijkanten delen de rest.
+        mid_percent = self._middle_percent()
+        self.columnconfigure(0, weight=100 - mid_percent, uniform="BSColumns")
+        self.columnconfigure(1, weight=2 * mid_percent, uniform="BSColumns")
+        self.columnconfigure(2, weight=100 - mid_percent, uniform="BSColumns")
         
         self.rowconfigure(0, weight=0)
         self.rowconfigure(1, weight=1)
@@ -448,16 +457,6 @@ class BigScreenView(tk.Toplevel):
     def update_turns(self):
         self.info['TurnCount'].updateLastTurns()
     
-    def _on_resize(self, event):
-        total_width = event.width
-        middle_width = total_width // self.settings['BS Mid col. width divider'].get()           # 1/5 voor middelste kolom
-        side_width = (total_width - middle_width) // 2
-
-        # Stel kolombreedtes dynamisch in
-        self.grid_columnconfigure(0, minsize=side_width)
-        self.grid_columnconfigure(1, minsize=middle_width)
-        self.grid_columnconfigure(2, minsize=side_width)   
-        
     def toggle_fullscreen(self, event=None):
        # if not self.attributes("-fullscreen"):
         self.attributes("-fullscreen", not self.attributes("-fullscreen"))

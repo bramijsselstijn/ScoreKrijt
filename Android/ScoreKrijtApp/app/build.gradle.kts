@@ -18,8 +18,8 @@ android {
         applicationId = "com.example.scorekrijtapp"
         minSdk = 26
         targetSdk = 36
-        versionCode = 285
-        versionName = "2.8.5"
+        versionCode = 288
+        versionName = "2.8.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,4 +49,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+// Google Drive zet in elke map een desktop.ini. Android Studio ziet die als resource en
+// stopt met de fout "The file name must end with .xml or .png". Ruim ze voor de build op.
+val removeDriveMetadata by tasks.registering(Delete::class) {
+    delete(fileTree("src") { include("**/desktop.ini") })
+}
+tasks.matching { it.name.matches(Regex("(merge|package).*Resources")) }.configureEach {
+    dependsOn(removeDriveMetadata)
 }

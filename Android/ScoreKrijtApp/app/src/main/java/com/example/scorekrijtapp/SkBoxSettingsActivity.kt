@@ -13,18 +13,19 @@ import androidx.core.view.WindowInsetsCompat
 import org.json.JSONObject
 
 class SkBoxSettingsActivity : AppCompatActivity() {
-    private data class Setting(val key: String, val label: String, val min: Int, val max: Int)
+    private data class Setting(val key: String, val label: String, val min: Int, val max: Int, val unit: String = "")
     private val definitions = listOf(
         Setting("history_rows", "Aantal getoonde beurten", 1, 10),
-        Setting("player_name_size", "Spelersnamen", 20, 120),
-        Setting("score_text_size", "Tekst caramboles / score", 20, 80),
-        Setting("score_value_size", "Waarde caramboles / score", 120, 280),
-        Setting("turn_text_size", "Tekst beurt", 50, 90), Setting("turn_value_size", "Waarde beurt", 50, 150),
-        Setting("current_car_text_size", "Tekst huidige caramboles", 20, 80), Setting("current_car_value_size", "Waarde huidige caramboles", 40, 80),
-        Setting("tmc_text_size", "Tekst TMC", 10, 60), Setting("tmc_value_size", "Waarde TMC", 15, 90),
-        Setting("points_text_size", "Tekst punten", 10, 50), Setting("points_value_size", "Waarde punten", 20, 80),
-        Setting("stats_text_size", "Tekst statistieken", 10, 50), Setting("stats_value_size", "Waarden statistieken", 20, 80),
-        Setting("history_text_size", "Tekst geschiedenis", 10, 50), Setting("history_value_size", "Waarden geschiedenis", 10, 50)
+        Setting("middle_width_percent", "Breedte middelste kolom", 10, 60, "%"),
+        Setting("player_name_size", "Spelersnamen", 20, 200),
+        Setting("score_text_size", "Tekst caramboles / score", 20, 160),
+        Setting("score_value_size", "Waarde caramboles / score", 120, 500),
+        Setting("turn_text_size", "Tekst beurt", 50, 160), Setting("turn_value_size", "Waarde beurt", 50, 300),
+        Setting("current_car_text_size", "Tekst huidige caramboles", 20, 160), Setting("current_car_value_size", "Waarde huidige caramboles", 40, 200),
+        Setting("tmc_text_size", "Tekst TMC", 10, 120), Setting("tmc_value_size", "Waarde TMC", 15, 180),
+        Setting("points_text_size", "Tekst punten", 10, 100), Setting("points_value_size", "Waarde punten", 20, 160),
+        Setting("stats_text_size", "Tekst statistieken", 10, 100), Setting("stats_value_size", "Waarden statistieken", 20, 160),
+        Setting("history_text_size", "Tekst geschiedenis", 10, 100), Setting("history_value_size", "Waarden geschiedenis", 10, 100)
     )
     private val values = mutableMapOf<String, Int>()
     private val valueLabels = mutableMapOf<String, TextView>()
@@ -72,7 +73,7 @@ class SkBoxSettingsActivity : AppCompatActivity() {
         valueLabels[d.key] = valueLabel; seekBars[d.key] = seek
         container.addView(label); container.addView(valueLabel); container.addView(seek)
         seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(bar: SeekBar?, progress: Int, fromUser: Boolean) { if (fromUser) { values[d.key] = d.min + progress; valueLabel.text = (d.min + progress).toString() } }
+            override fun onProgressChanged(bar: SeekBar?, progress: Int, fromUser: Boolean) { if (fromUser) { values[d.key] = d.min + progress; valueLabel.text = "${d.min + progress}${d.unit}" } }
             override fun onStartTrackingTouch(bar: SeekBar?) = Unit
             override fun onStopTrackingTouch(bar: SeekBar?) { if (!loading) send("preview_display_settings") }
         })
@@ -88,7 +89,7 @@ class SkBoxSettingsActivity : AppCompatActivity() {
         if (message.optString("event") != "display_settings") return
         val settings = message.optJSONObject("settings") ?: return; loading = true
         historySwitch.isChecked = settings.optBoolean("show_history", true)
-        definitions.forEach { d -> if (settings.has(d.key)) { val number = settings.optInt(d.key).coerceIn(d.min, d.max); values[d.key] = number; valueLabels[d.key]?.text = number.toString(); seekBars[d.key]?.progress = number - d.min } }
+        definitions.forEach { d -> if (settings.has(d.key)) { val number = settings.optInt(d.key).coerceIn(d.min, d.max); values[d.key] = number; valueLabels[d.key]?.text = "$number${d.unit}"; seekBars[d.key]?.progress = number - d.min } }
         loading = false; status.text = if (message.optBoolean("saved")) "Opgeslagen op de SK-Box" else "Wijzigingen worden direct getoond"
     }
 

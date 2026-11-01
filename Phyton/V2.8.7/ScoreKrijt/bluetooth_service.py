@@ -6,6 +6,7 @@ Leest JSON-regels vanaf /dev/rfcomm0 en geeft geldige berichten
 door aan een callback.
 """
 
+import sys
 import threading
 import time
 
@@ -36,6 +37,20 @@ class BluetoothService:
         self.running = False
         self.thread = None
         self.write_lock = threading.Lock()
+        self._last_error = None
+
+    def _log(self, text):
+        # Komt in scorekrijt-autostart.log terecht (de launcher stuurt stderr daarheen).
+        stamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{stamp} [bluetooth] {text}", file=sys.stderr, flush=True)
+
+    def _log_error(self, error):
+        # Alleen loggen als de melding verandert, anders komt er elke 2 seconden
+        # een regel bij zolang er geen telefoon verbonden is.
+        text = f"{type(error).__name__}: {error}"
+        if text != self._last_error:
+            self._last_error = text
+            self._log(f"poort gesloten of niet beschikbaar: {text}")
 
     def start(self):
         if serial is None:
@@ -89,6 +104,8 @@ class BluetoothService:
             try:
                 if self.serial_connection is None:
                     self._connect()
+                    self._last_error = None
+                    self._log(f"{self.port} geopend")
                     self.send(BluetoothProtocol.ok("bluetooth_connected"))
 
                 line = self.serial_connection.readline()
@@ -108,7 +125,8 @@ class BluetoothService:
                 except Exception as e:
                     self.send(BluetoothProtocol.error(f"Fout bij verwerken: {e}"))
 
-            except Exception:
+            except Exception as error:
+                self._log_error(error)
                 if self.serial_connection:
                     try:
                         self.serial_connection.close()

@@ -114,26 +114,32 @@
             <Button
                 android:id="@+id/btn_sk_box_settings_dialog"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Instellingen\nSK-Box"
-                android:textSize="10sp" />
+                android:lines="2"
+                android:paddingHorizontal="2dp"
+                android:textSize="11sp" />
 
             <Button
                 android:id="@+id/btn_sync_to_sk_box"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Synchroniseer\nnaar SK-Box"
-                android:textSize="10sp" />
+                android:lines="2"
+                android:paddingHorizontal="2dp"
+                android:textSize="11sp" />
 
             <Button
                 android:id="@+id/btn_sync_from_sk_box"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Synchroniseer\nvan SK-Box"
-                android:textSize="10sp" />
+                android:lines="2"
+                android:paddingHorizontal="2dp"
+                android:textSize="11sp" />
         </LinearLayout>
 
     </LinearLayout>

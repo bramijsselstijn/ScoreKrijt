@@ -172,6 +172,7 @@ class MainActivity : AppCompatActivity() {
         val totalPlayTimeSeconds = game.optLong("player1_play_time", 0) + game.optLong("player2_play_time", 0)
         getSharedPreferences("ScoreKrijtState", MODE_PRIVATE).edit()
             .putBoolean("GAME_IN_PROGRESS", true)
+            .putBoolean("GAME_FINISHED", false)
             .putString("P1_NAME", game.optString("player1", getString(R.string.player1_default)))
             .putString("P2_NAME", game.optString("player2", getString(R.string.player2_default)))
             .putFloat("P1_TMC", game.optDouble("player1_tmc", 20.0).toFloat())
@@ -257,7 +258,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("SK-Box verbinden")
+            .setTitle("Selecteer SK-Box")
             .setAdapter(SkBoxDeviceAdapter(devices)) { _, which ->
                 val device = devices[which]
                 getSharedPreferences("ScoreKrijtPrefs", MODE_PRIVATE)
@@ -299,8 +300,11 @@ class MainActivity : AppCompatActivity() {
     }
     private fun checkResumeButton() {
         val prefs = getSharedPreferences("ScoreKrijtState", MODE_PRIVATE)
-        val inProgress = prefs.getBoolean("GAME_IN_PROGRESS", false)
-        findViewById<Button>(R.id.btnResumeMatch).visibility = if (inProgress) View.VISIBLE else View.GONE
+        val saved = prefs.getBoolean("GAME_IN_PROGRESS", false)
+        val finished = prefs.getBoolean("GAME_FINISHED", false)
+        val btnResume = findViewById<Button>(R.id.btnResumeMatch)
+        btnResume.text = getString(if (finished) R.string.ReopenLastGameKnop else R.string.ResumeGameKnop)
+        btnResume.visibility = if (saved) View.VISIBLE else View.GONE
     }
 
     private fun checkLastMatchSummaryButton() {
