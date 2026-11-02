@@ -770,7 +770,8 @@ $s = New-StepList
 Step $s 'Zet het nieuwe APK-bestand op de telefoon, bijvoorbeeld via USB of een gedeelde map.'
 Step $s 'Open het bestand op de telefoon en kies **Installeren** of **Bijwerken**. Geef zo nodig eenmalig toestemming om apps uit deze bron te installeren.'
 Step $s 'Start de app en verbind met de SK-Box. Je lopende wedstrijd en je gekoppelde SK-Box blijven behouden.'
-Callout 'warn' 'Gebruik steeds hetzelfde soort APK' 'Android accepteert een update alleen als het nieuwe APK-bestand met dezelfde sleutel is ondertekend als de geïnstalleerde app. Geeft Android een melding dat de app niet kan worden geïnstalleerd, dan is dat meestal de oorzaak. Verwijderen en opnieuw installeren lost het op, maar wist ook de lokaal opgeslagen gegevens, zoals een lopende wedstrijd en het laatste wedstrijdoverzicht.'
+Callout 'warn' 'Vanaf versie 2.8.9 een nieuwe pakketnaam' 'De app heeft sinds versie 2.8.9 de pakketnaam `io.github.bramijsselstijn.scorekrijt`. Android ziet dat als een andere app: de nieuwe APK installeert naast de oude en werkt die niet bij. Maak een lopende wedstrijd eerst af, want de opgeslagen gegevens van de oude app (zoals de laatste wedstrijd en het onthouden van de SK-Box) worden niet overgenomen. Geef de nieuwe app de Bluetooth-toestemming als daarom wordt gevraagd. De koppeling met de SK-Box in de Bluetooth-instellingen van de telefoon blijft bestaan. Verwijder de oude app nadat je de nieuwe hebt getest.'
+Callout 'warn' 'Gebruik steeds hetzelfde soort APK''Android accepteert een update alleen als het nieuwe APK-bestand met dezelfde sleutel is ondertekend als de geïnstalleerde app. Geeft Android een melding dat de app niet kan worden geïnstalleerd, dan is dat meestal de oorzaak. Verwijderen en opnieuw installeren lost het op, maar wist ook de lokaal opgeslagen gegevens, zoals een lopende wedstrijd en het laatste wedstrijdoverzicht.'
 
 H1 '9. Storingen bij het bijwerken'
 Tbl @('Probleem', 'Mogelijke oorzaak', 'Oplossing') @(

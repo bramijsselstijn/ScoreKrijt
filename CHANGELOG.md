@@ -1,5 +1,19 @@
 # ScoreKrijt changelog
 
+## V2.8.9 – Help en spelregels op het hoofdscherm en nieuwe pakketnaam
+
+2.8.8 is al uitgebracht (tag `v2.8.8`), dus deze versie is 2.8.9: hoger dan de laatste en lager dan V2.9. Alleen de Android-app is gewijzigd; de SK-Box blijft ongewijzigd (code 2.8.7.1) en het Bluetooth-protocol blijft versie 2. Door de gebruiker getest op een telefoon op 2 november 2026.
+
+### Android-app
+
+- Hoofdscherm: nieuwe knop `Help / Spelregels`. Die opent hetzelfde helpscherm als in het wedstrijdscherm.
+- Help en alle helpteksten: ruimte boven (voor de statusbalk) en onder (voor de navigatieknoppen), net als de andere schermen.
+- Help: bovenaan de lijst een verwijzing naar GitHub (`github.com/bramijsselstijn/ScoreKrijt`) voor de handleidingen en extra uitleg over de SK-Box. De verwijzing is het eerste item van de lijst en scrolt dus mee. Hij opent de browser; de app zelf gebruikt nog steeds geen internet.
+- Webadressen in de helpteksten zijn klikbaar.
+- De teksten `Help` en `Over ScoreKrijt` zijn naar het Nederlands vertaald. `Over ScoreKrijt` is aangevuld met het versienummer (uit de app zelf), de maker, de AI-vermelding, de GitHub-verwijzing, privacy, de licentie (GPL-3.0) en een dankwoord.
+- Pakketnaam (`applicationId`) is `io.github.bramijsselstijn.scorekrijt`, nodig voor de Google Play Store (Google weigert `com.example`). Voor Android is dit een andere app: de nieuwe APK installeert naast de oude `com.example.scorekrijtapp` en kan er niet op bijwerken. De opgeslagen gegevens van de oude app (laatste wedstrijd, het onthouden van de SK-Box) worden niet overgenomen; de koppeling met de SK-Box in de Bluetooth-instellingen van Android blijft bestaan. De codepakketnaam (`namespace`) is ongewijzigd.
+- Versienummer is `2.8.9` (versionName `2.8.9`, versionCode `289`, hello-bericht).
+
 ## V2.8.8 – moyenne in het CSV-bestand en laatste wedstrijd heropenen
 
 Alleen de Android-app is gewijzigd; de SK-Box blijft ongewijzigd (code 2.8.7) en het Bluetooth-protocol blijft versie 2. Nog niet op een telefoon getest.

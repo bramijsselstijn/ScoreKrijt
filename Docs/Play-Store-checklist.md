@@ -24,8 +24,9 @@ De app heet nu `com.example.scorekrijtapp`. Google Play weigert pakketnamen die 
 - De deelfunctie gebruikt de pakketnaam automatisch (`${packageName}.fileprovider`), dus daar hoeft niets aan te veranderen.
 - Meld de overstap in het changelog en in de uitleg bij de downloads.
 
-- [ ] Pakketnaam gekozen: `______________________`
-- [ ] `applicationId` aangepast en een testbouw geprobeerd op een telefoon
+- [x] Pakketnaam gekozen: `io.github.bramijsselstijn.scorekrijt` (2 november 2026)
+- [x] `applicationId` aangepast in `app/build.gradle.kts`; de samengevoegde manifest-controle klopt (pakketnaam en `.fileprovider`)
+- [ ] Testbouw geprobeerd op een telefoon: de nieuwe app installeert naast de oude (`com.example.scorekrijtapp`) en neemt geen gegevens over
 
 ### 1.2 Overige keuzes
 

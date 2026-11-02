@@ -2,7 +2,7 @@
 
 Scoreteller voor biljart: een Android-app voor op de telefoon en de SK-Box (Python, Raspberry Pi) voor het grootscherm. Telefoon en SK-Box communiceren via Bluetooth.
 
-Huidige versie: **2.8.8**.
+Huidige versie: **2.8.9**.
 
 ## Gemaakt met behulp van AI
 
