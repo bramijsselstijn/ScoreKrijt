@@ -12,16 +12,16 @@ ScoreKrijt (de Android-app, de SK-Box-software, de hulpscripts en de handleiding
 
 ## Inhoud
 
-- `Android/ScoreKrijtApp/` – broncode van de Android-app
+- `Android/ScoreKrijt_V2.8.8.apk` – de nieuwste versie van de Android-app (de broncode van de app wordt niet op GitHub gepubliceerd)
 - `Phyton/V2.8.7/` – broncode van de SK-Box (huidige versie)
 - `Phyton/SK-Box_scripts/` – hulpscripts voor de SK-Box: `sk-update.sh` (bijwerken via USB-stick, zonder internet) en `sk-stille-opstart.sh` (stille opstart met het ScoreKrijt-logo, taakbalk uit, wifi uit)
-- `Docs/` – handleidingen (SK-Box installeren, SK-Box bijwerken, Instellingen van de SK-Box) en het script waarmee ze worden gebouwd (`build_skbox_handleidingen.ps1`, vereist Microsoft Word)
+- `Docs/` – handleidingen als pdf (SK-Box installeren, SK-Box bijwerken, Instellingen van de SK-Box) en het script waarmee ze worden gebouwd (`build_skbox_handleidingen.ps1`, vereist Microsoft Word)
 - [`CHANGELOG.md`](CHANGELOG.md) – wat er per versie is veranderd
 - [`ROADMAP.md`](ROADMAP.md) – geplande versies
 
 ## Versies
 
-Elke versie krijgt een tag (bijvoorbeeld `v2.8.7`). Gecompileerde APK's staan niet in de repository; die horen bij een GitHub Release.
+Elke versie krijgt een tag (bijvoorbeeld `v2.8.7`). Van de Android-app staat alleen de nieuwste APK in de repository.
 
 ## De SK-Box installeren en bijwerken
 

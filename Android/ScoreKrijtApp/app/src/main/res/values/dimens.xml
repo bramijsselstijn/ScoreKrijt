@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Reliëf van de drukknoppen: schaduw in rust en bij indrukken -->
-    <dimen name="button_elevation">5dp</dimen>
-    <dimen name="button_elevation_pressed">1dp</dimen>
-</resources>
