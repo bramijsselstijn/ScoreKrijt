@@ -565,6 +565,7 @@ Callout 'info' 'Drie manieren om bij te werken' 'Hoofdstuk 3: met een USB-stick 
 
 H1 '2. De nieuwe versie klaarzetten op je pc'
 Para ('Haal de nieuwe versie eerst op van GitHub, zoals beschreven in de installatiehandleiding, hoofdstuk 2.1. Gebruik daarna de map ' + $MapC + '. Je kopieert daaruit **alleen** de onderstaande onderdelen naar de SK-Box:')
+Shot 'install-2.1-github-download' 'De nieuwste versie ophalen van GitHub: Code (1) en Download ZIP (2).'
 Tbl @('Wel kopiëren', 'Niet kopiëren') @(
     @('`ScoreKrijt` (de map met het programma en de iconen)', '`ScoreKrijtSettings.json`'),
     @('`ScoreKrijt.py`', 'De mappen `matches`, `build` en `dist`'),
@@ -582,6 +583,9 @@ USB-stick
     sk-update.sh              (optioneel, nieuwste versie)
     sk-stille-opstart.sh      (optioneel, nieuwste versie)
 '@
+Shot 'install-6.2-scripts' 'De hoofdmap van de USB-stick met de map `ScoreKrijt_update`.'
+Para 'Kopieer de onderdelen in Verkenner, open de map `ScoreKrijt_update` op de stick en klik met de rechtermuisknop in de lege map (pijl 6). Kies daarna **Plakken** (pijl 7).'
+Shot 'install-6.2-plakken' 'Met de rechtermuisknop in de map (6) en Plakken (7) komen de onderdelen op de stick.'
 Para ('Of in PowerShell, vanuit de map ' + $MapC + ' (vervang `E:` door de stationsletter van je stick):')
 CodeBlock @'
 $stick = "E:\ScoreKrijt_update"
@@ -595,8 +599,10 @@ H1 '3. De update uitvoeren met een USB-stick'
 Para 'Dit is de aanbevolen manier. Het script `sk-update.sh` zoekt de stick zelf, controleert de bestanden, behoudt je instellingen en wedstrijden en bewaart de vorige versie. De stappen voer je uit op de SK-Box met een toetsenbord; een netwerk is niet nodig.'
 H2 '3.1 Stappen'
 $s = New-StepList
-Step $s '**Steek de USB-stick in de SK-Box** en wacht ongeveer tien seconden.'
-Step $s '**Open een Terminal.** Druk op **Ctrl+Alt+F2** en meld je aan met gebruikersnaam `user` en wachtwoord `user`.'
+Step $s '**Steek de USB-stick in de SK-Box** en wacht ongeveer tien seconden. Staat de desktop in beeld, dan verschijnt de melding **Removable medium is inserted**. Sluit die af met **OK** (pijl 11) of laat hem open; het updatescript zoekt de stick zelf.'
+Shot 'install-6.2-sk-usb-melding' 'De melding bij het insteken van de stick (11).'
+Step $s '**Open een Terminal.** Druk op **Ctrl+Alt+F2** en meld je aan met gebruikersnaam `user` en wachtwoord `user`. Draait ScoreKrijt op de desktop, druk dan op **F12** om de taakbalk te tonen en klik op het Terminal-pictogram (pijl 9). Het Terminalvenster opent daarna (pijl 10), zie ook de installatiehandleiding, hoofdstuk 13.5.'
+Shot 'install-13.5-terminal' 'Een Terminal starten vanaf de taakbalk (9); het venster opent in beeld (10).'
 Step $s '**Start het updatescript** (zonder `sudo`):'
 CodeBlock 'bash ~/sk-update.sh'
 Step $s '**Controleer de versies.** Het script toont de huidige en de nieuwe versie. Bevestig met `j` en Enter.'
