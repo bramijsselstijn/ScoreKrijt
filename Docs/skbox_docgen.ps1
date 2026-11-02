@@ -3,6 +3,7 @@
 
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+Add-Type -AssemblyName System.Drawing
 
 $script:Blue = '214F6B'
 $script:Gold = 'C7942E'
@@ -10,11 +11,17 @@ $script:Width = 9638
 $script:sb = $null
 $script:nextNum = 1
 $script:numInstances = @()
+$script:ShotDir = Join-Path $PSScriptRoot 'Screenshots'
+$script:images = @()
+$script:shotNr = 0
+$script:missingShots = @()
 
 function Start-Doc {
     $script:sb = New-Object System.Text.StringBuilder
     $script:nextNum = 1
     $script:numInstances = @()
+    $script:images = @()
+    $script:shotNr = 0
 }
 
 function Add-Xml([string]$x) { [void]$script:sb.Append($x) }
@@ -135,6 +142,101 @@ function Tbl([string[]]$headers, [object[]]$rows, [int[]]$widths) {
     Spacer
 }
 
+# Screenshots: bestanden in Docs\Screenshots (png of jpg, zonder extensie opgegeven).
+# Ontbreekt een bestand, dan slaat de build de afbeelding over en meldt dat aan het eind.
+function Find-Shot([string]$name) {
+    foreach ($ext in '.png', '.jpg', '.jpeg') {
+        $p = Join-Path $script:ShotDir ($name + $ext)
+        if (Test-Path -LiteralPath $p) { return $p }
+    }
+    $script:missingShots += $name
+    return $null
+}
+
+# Leest de afbeelding in, verkleint hem als hij breder is dan 1800 px en geeft de grootte in EMU terug
+# (natuurlijke grootte bij 96 dpi, begrensd op $maxW x $maxH).
+function Add-ShotImage([string]$path, [long]$maxW, [long]$maxH) {
+    $ext = [System.IO.Path]::GetExtension($path).ToLower()
+    if ($ext -eq '.jpeg') { $ext = '.jpg' }
+    $src = [System.Drawing.Image]::FromFile($path)
+    try {
+        $w = $src.Width; $h = $src.Height
+        $bytes = $null
+        if ($w -gt 1800) {
+            $nh = [int][math]::Round($h * 1800 / $w)
+            $bmp = New-Object System.Drawing.Bitmap(1800, $nh)
+            $g = [System.Drawing.Graphics]::FromImage($bmp)
+            $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+            $g.DrawImage($src, 0, 0, 1800, $nh)
+            $g.Dispose()
+            $ms = New-Object System.IO.MemoryStream
+            if ($ext -eq '.jpg') { $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Jpeg) }
+            else { $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png) }
+            $bmp.Dispose()
+            $bytes = $ms.ToArray()
+            $ms.Dispose()
+        } else {
+            $bytes = [System.IO.File]::ReadAllBytes($path)
+        }
+        $emuW = [double]$w * 9525; $emuH = [double]$h * 9525
+        $scale = [math]::Min(1.0, [math]::Min($maxW / $emuW, $maxH / $emuH))
+        $n = $script:images.Count + 1
+        $script:images += @{ Rid = "rIdImg$n"; Part = "media/img$n$ext"; Bytes = $bytes }
+        return @{ Rid = "rIdImg$n"; Id = 100 + $n; Cx = [long]($emuW * $scale); Cy = [long]($emuH * $scale) }
+    } finally { $src.Dispose() }
+}
+
+function ImageRun($img, [string]$descr) {
+    $rid = $img.Rid; $id = $img.Id; $cx = $img.Cx; $cy = $img.Cy
+    return ("<w:r><w:drawing><wp:inline distT='0' distB='0' distL='0' distR='0'>" +
+        "<wp:extent cx='$cx' cy='$cy'/><wp:docPr id='$id' name='Afbeelding $id' descr='$(Esc $descr)'/>" +
+        "<wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect='1'/></wp:cNvGraphicFramePr>" +
+        "<a:graphic><a:graphicData uri='http://schemas.openxmlformats.org/drawingml/2006/picture'><pic:pic>" +
+        "<pic:nvPicPr><pic:cNvPr id='$id' name='$rid'/><pic:cNvPicPr/></pic:nvPicPr>" +
+        "<pic:blipFill><a:blip r:embed='$rid'/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>" +
+        "<pic:spPr><a:xfrm><a:off x='0' y='0'/><a:ext cx='$cx' cy='$cy'/></a:xfrm><a:prstGeom prst='rect'><a:avLst/></a:prstGeom>" +
+        "<a:ln w='9525'><a:solidFill><a:srgbClr val='B8C2CA'/></a:solidFill></a:ln></pic:spPr>" +
+        "</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>")
+}
+
+function ShotCaption([string]$caption) {
+    $script:shotNr++
+    return "<w:p><w:pPr><w:pStyle w:val='Caption'/></w:pPr>$(Run ("Afbeelding $($script:shotNr). ") '<w:b/>')$(Inline $caption)</w:p>"
+}
+
+# Een afbeelding op de volle breedte (of kleiner als hij van zichzelf klein is), met bijschrift.
+function Shot([string]$name, [string]$caption) {
+    $path = Find-Shot $name
+    if (-not $path) { return }
+    $img = Add-ShotImage $path 6120000 4320000
+    Add-Xml ("<w:p><w:pPr><w:pStyle w:val='Afbeelding'/><w:keepNext/></w:pPr>$(ImageRun $img $caption)</w:p>" + (ShotCaption $caption))
+}
+
+# Twee of drie afbeeldingen naast elkaar, bijvoorbeeld telefoonschermen.
+function ShotRow([string[]]$names, [string[]]$captions) {
+    $found = @()
+    for ($i = 0; $i -lt $names.Count; $i++) {
+        $p = Find-Shot $names[$i]
+        if ($p) { $found += , @($p, $captions[$i]) }
+    }
+    if ($found.Count -eq 0) { return }
+    $cellW = [int][math]::Floor($script:Width / $found.Count)
+    $maxW = [long](($cellW - 200) * 635)
+    $grid = ((1..$found.Count) | ForEach-Object { "<w:gridCol w:w='$cellW'/>" }) -join ''
+    $x = "<w:tbl><w:tblPr><w:tblW w:w='$($cellW * $found.Count)' w:type='dxa'/><w:tblLayout w:type='fixed'/>" +
+        "<w:tblCellMar><w:top w:w='0' w:type='dxa'/><w:left w:w='100' w:type='dxa'/><w:bottom w:w='0' w:type='dxa'/><w:right w:w='100' w:type='dxa'/></w:tblCellMar>" +
+        "</w:tblPr><w:tblGrid>$grid</w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>"
+    foreach ($f in $found) {
+        $img = Add-ShotImage $f[0] $maxW 4000000
+        $x += "<w:tc><w:tcPr><w:tcW w:w='$cellW' w:type='dxa'/></w:tcPr>" +
+            "<w:p><w:pPr><w:pStyle w:val='Afbeelding'/><w:keepNext/></w:pPr>$(ImageRun $img $f[1])</w:p>" +
+            (ShotCaption $f[1]) + '</w:tc>'
+    }
+    $x += '</w:tr></w:tbl>'
+    Add-Xml $x
+    Spacer
+}
+
 function Cover([string]$label, [string]$title, [string]$subtitle, [string]$meta, [string]$logoPath) {
     Add-Xml "<w:p><w:pPr><w:spacing w:before='2600' w:after='0'/></w:pPr></w:p>"
     if (Test-Path $logoPath) {
@@ -200,6 +302,8 @@ function Get-StylesXml {
 <w:style w:type="paragraph" w:styleId="ListBullet"><w:name w:val="List Bullet"/><w:basedOn w:val="Normal"/><w:uiPriority w:val="99"/><w:qFormat/><w:pPr><w:spacing w:after="60"/><w:ind w:left="454" w:hanging="284"/></w:pPr></w:style>
 <w:style w:type="paragraph" w:styleId="ListNumber"><w:name w:val="List Number"/><w:basedOn w:val="Normal"/><w:uiPriority w:val="99"/><w:qFormat/><w:pPr><w:spacing w:after="80"/><w:ind w:left="454" w:hanging="340"/></w:pPr></w:style>
 <w:style w:type="paragraph" w:customStyle="1" w:styleId="Check"><w:name w:val="Controlepunt"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:spacing w:after="60"/><w:ind w:left="454" w:hanging="454"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:customStyle="1" w:styleId="Afbeelding"><w:name w:val="Afbeelding"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:spacing w:before="120" w:after="40" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:styleId="Caption"><w:name w:val="caption"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:uiPriority w:val="35"/><w:unhideWhenUsed/><w:qFormat/><w:pPr><w:spacing w:before="0" w:after="200" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr><w:rPr><w:i/><w:color w:val="5F6970"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr></w:style>
 <w:style w:type="paragraph" w:styleId="Header"><w:name w:val="header"/><w:basedOn w:val="Normal"/><w:uiPriority w:val="99"/><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="4" w:space="4" w:color="D5DCE1"/></w:pBdr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/><w:color w:val="6B767F"/><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:style>
 <w:style w:type="paragraph" w:styleId="Footer"><w:name w:val="footer"/><w:basedOn w:val="Normal"/><w:uiPriority w:val="99"/><w:pPr><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:color w:val="6B767F"/><w:sz w:val="17"/><w:szCs w:val="17"/></w:rPr></w:style>
 </w:styles>
@@ -239,7 +343,7 @@ function Save-Doc([string]$Path, [string]$HeaderText, [string]$FooterText, [stri
 
     $contentTypes = $decl + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
         '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
-        '<Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpg" ContentType="image/jpeg"/>' +
         '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
         '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
         '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>' +
@@ -260,7 +364,11 @@ function Save-Doc([string]$Path, [string]$HeaderText, [string]$FooterText, [stri
         '<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>' +
         '<Relationship Id="rIdHeader" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>' +
         '<Relationship Id="rIdFooter" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>' +
-        '<Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/></Relationships>'
+        '<Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/>'
+    foreach ($im in $script:images) {
+        $docRels += "<Relationship Id=""$($im.Rid)"" Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"" Target=""$($im.Part)""/>"
+    }
+    $docRels += '</Relationships>'
 
     $stamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
     $core = $decl + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
@@ -295,6 +403,10 @@ function Save-Doc([string]$Path, [string]$HeaderText, [string]$FooterText, [stri
             $entry = $zip.CreateEntry('word/media/logo.png')
             $bytes = [System.IO.File]::ReadAllBytes($LogoPath)
             $s = $entry.Open(); $s.Write($bytes, 0, $bytes.Length); $s.Close()
+        }
+        foreach ($im in $script:images) {
+            $entry = $zip.CreateEntry('word/' + $im.Part)
+            $s = $entry.Open(); $s.Write($im.Bytes, 0, $im.Bytes.Length); $s.Close()
         }
     } finally { $zip.Dispose() }
 }

@@ -30,7 +30,7 @@ Spacer
 Tbl @('Vervang', 'Door', 'Hoe vind je dit?') @(
     @('`<IP-adres>`', 'Het IP-adres van de SK-Box', 'Typ `hostname -I` op de Pi (zie hoofdstuk 4).')
 ) @(2400, 3400, 3838)
-Callout 'info' 'Inloggegevens van de SK-Box' 'In deze handleiding heeft de SK-Box de gebruikersnaam `user` en het wachtwoord `user`. Stel ze zo in bij het inrichten van Raspberry Pi OS (Raspberry Pi Imager of `raspi-config`); je hebt ze nodig bij SSH en bij inloggen op de SK-Box zelf.'
+Callout 'info' 'Inloggegevens van de SK-Box' 'In deze handleiding heeft de SK-Box de gebruikersnaam `user` en het wachtwoord `user`. Stel ze zo in bij de eerste start van Raspberry Pi OS (hoofdstuk 3.1) of in Raspberry Pi Imager; je hebt ze nodig bij SSH en bij inloggen op de SK-Box zelf.'
 Callout 'warn' 'Eenvoudig wachtwoord' 'Het wachtwoord `user` is makkelijk te raden. Dat is acceptabel zolang de SK-Box nooit met internet of een openbaar netwerk is verbonden (zie hoofdstuk 14). Sluit je de SK-Box wel op een netwerk aan, kies dan een sterker wachtwoord.'
 Callout 'warn' 'Heb je al een werkende SK-Box?' 'Wil je alleen een nieuwe versie van het programma installeren, volg dan de handleiding **SK-Box bijwerken**. Een nieuwe installatie is daarvoor niet nodig.'
 
@@ -40,17 +40,57 @@ Bullet 'Raspberry Pi OS met Desktop (64-bit wordt aanbevolen voor recente Pi-mod
 Bullet 'Een HDMI-scherm voor het scorebord.'
 Bullet 'Een toetsenbord en een netwerkverbinding voor de eerste installatie. Daarna is internet niet meer nodig (hoofdstuk 14).'
 Bullet 'Een USB-stick om bestanden en later updates naar de SK-Box te brengen.'
-Bullet ('De programmamap ' + $MapC + ' uit het ScoreKrijt-project, op je pc.')
+Bullet ('De programmamap ' + $MapC + ' uit het ScoreKrijt-project, op je pc. Die haal je eerst op van GitHub (zie hoofdstuk 2.1).')
 Bullet 'Een pc met Windows om de bestanden te kopiëren (via USB-stick of via het netwerk).'
 Bullet 'Een Android-telefoon met de ScoreKrijt-app.'
+Bullet 'Alleen bij de geprinte SK-Box: een inbussleutel van 2 mm om de Raspberry Pi uit de behuizing te halen (zie hoofdstuk 2.2).'
+
+H2 '2.1 De ScoreKrijt-bestanden van GitHub ophalen'
+Para 'Alle bestanden van ScoreKrijt staan op GitHub. Haal ze eerst op je pc op; daarna kopieer je ze naar de SK-Box (hoofdstuk 6). Dit doe je op een pc met internet. De SK-Box zelf heeft geen internet nodig.'
+$s = New-StepList
+Step $s '**Open de projectpagina** in je browser: `https://github.com/bramijsselstijn/ScoreKrijt`'
+Step $s '**Klik op de groene knop Code** (pijl 1) en kies **Download ZIP** (pijl 2). Je krijgt het bestand `ScoreKrijt-main.zip`.'
+Shot 'install-2.1-github-download' 'De projectpagina op GitHub: eerst de groene knop Code (1), daarna Download ZIP (2).'
+Step $s '**Pak het ZIP-bestand uit.** Zoek `ScoreKrijt-main.zip` in je map Downloads, klik er met de rechtermuisknop op en kies **Alles uitpakken** (pijl 3). Kies een map die je terugvindt, bijvoorbeeld Documenten.'
+Shot 'install-2.1-uitpakken' 'Het ZIP-bestand uitpakken met Alles uitpakken (3).'
+Step $s ('**Controleer de inhoud.** In de uitgepakte map staat de map `Phyton`. De programmamap ' + $MapC + ' daarin gebruik je in de rest van deze handleiding. De map `Phyton\SK-Box_scripts` bevat de twee hulpscripts en in de map `Android` staat de APK van de telefoonapp.')
+Callout 'info' 'Liever met Git?' 'Heb je Git op je pc, dan kan het ook met `git clone https://github.com/bramijsselstijn/ScoreKrijt.git`. Voor de SK-Box is de ZIP-download voldoende.'
+
+H2 '2.2 De Raspberry Pi uit de geprinte SK-Box halen'
+Para 'Gebruik je de geprinte SK-Box, dan zit de Raspberry Pi vast in de behuizing. Haal hem er zo uit. De microSD-kaart blijft in de Raspberry Pi zitten:'
+$s = New-StepList
+Step $s '**Schakel de SK-Box uit** en haal de voeding eruit.'
+Step $s '**Draai de vier schroeven los** met een inbussleutel van 2 mm.'
+Shot 'install-2.2-schroeven' 'De vier schroeven van de SK-Box, los te draaien met een inbussleutel van 2 mm.'
+Step $s '**Til de Raspberry Pi aan de kant van de voeding als eerste op** en kantel hem zo uit de behuizing.'
+Shot 'install-2.2-uitkantelen' 'De Raspberry Pi aan de voedingskant optillen en uit de behuizing kantelen.'
+Callout 'info' 'Terugplaatsen' 'Plaats de Raspberry Pi in omgekeerde volgorde terug en draai de vier schroeven weer vast. Draai ze niet te hard aan; de behuizing is geprint.'
 
 H1 '3. Raspberry Pi OS voorbereiden'
-H2 '3.1 Basisconfiguratie'
+H2 '3.1 Het welkomstscherm bij de eerste start'
+Para 'Start je een nieuwe SD-kaart voor het eerst op, dan verschijnt het scherm **Welcome to the Raspberry Pi Desktop**. Dat is de installatiewizard van Raspberry Pi OS. Je doorloopt hem één keer. Kies deze waarden:'
+$s = New-StepList
+Step $s '**Klik op Next** op het welkomstscherm.'
+Shot 'install-3.1-welkom' 'Het welkomstscherm van Raspberry Pi OS.'
+Step $s '**Land, taal en tijdzone.** Kies bij **Country** de waarde **Netherlands**, bij **Language** **Dutch** en bij **Timezone** **Amsterdam**. Laat **Use English language** uit, zodat de SK-Box Nederlands wordt. Vink **Use US keyboard** alleen aan als je toetsenbord een Amerikaanse indeling heeft. Klik op **Next**.'
+Shot 'install-3.1-land' 'Land, taal en tijdzone instellen.'
+Step $s '**Gebruiker aanmaken.** Vul als gebruikersnaam `user` in en als wachtwoord ook `user` (bij het wachtwoord twee keer). Klik op **Next**.'
+Shot 'install-3.1-gebruiker' 'De gebruiker `user` met het wachtwoord `user` aanmaken.'
+Step $s '**Internet verbinden.** Kies bij de vraag om een wifi-netwerk je eigen netwerk en vul het wachtwoord in. Sluit je liever een netwerkkabel aan, klik dan op **Skip**. Je hebt internet nodig om het systeem bij te werken (hoofdstuk 3.3) en om de benodigde software te installeren (hoofdstuk 5).'
+Shot 'install-3.1-wifi' 'De keuze van een wifi-netwerk tijdens de eerste start.'
+Step $s '**Software bijwerken overslaan.** Verschijnt de vraag om software bij te werken, klik dan op **Skip**. Het systeem werk je straks bij in hoofdstuk 3.3.'
+Step $s '**Afronden.** Klik op **Restart** (of **Done**). De Raspberry Pi start opnieuw op. Ga daarna verder met hoofdstuk 3.2.'
+Callout 'info' 'Gebruikersnaam en wachtwoord' 'Gebruik hier altijd `user` en `user`. Die gegevens heb je later nodig om in te loggen op de SK-Box (hoofdstuk 14.3) en om bij te werken. Zie hoofdstuk 1.1 voor de opmerking over dit eenvoudige wachtwoord.'
+Callout 'warn' 'Wifi alleen tijdelijk' 'Wifi of een netwerkkabel is alleen nodig tijdens de installatie (updates en software). Zet wifi na de eindcontrole weer uit, zoals beschreven in hoofdstuk 14. De SK-Box werkt daarna zonder internet.'
+Callout 'info' 'Geen welkomstscherm?' 'Zie je het welkomstscherm niet, bijvoorbeeld omdat de gebruiker al in Raspberry Pi Imager is ingesteld, ga dan door naar hoofdstuk 3.2. Controleer wel dat de gebruikersnaam `user` en het wachtwoord `user` zijn. De teksten en de volgorde van de wizard kunnen per versie van Raspberry Pi OS iets verschillen.'
+
+H2 '3.2 Basisconfiguratie'
 Para 'Open een Terminal op de Raspberry Pi en start het configuratieprogramma:'
 CodeBlock 'sudo raspi-config'
+Shot 'install-3.2-raspi-config' 'Het hoofdmenu van raspi-config. Kies met de pijltjestoetsen en Enter.'
 Para 'Stel de onderstaande onderdelen in:'
 Tbl @('Onderdeel', 'Waarde', 'Waarom') @(
-    @('System Options > Hostname', 'sk-box', 'Herkenbare netwerknaam.'),
+    @('System Options > Hostname', 'SK-Box', 'Herkenbare netwerknaam.'),
     @('System Options > Auto Login', 'Desktop autologin: Ja', 'Nodig voor het grafische opstarten.'),
     @('Localisation > Locale', 'nl_NL.UTF-8', 'Nederlandse tekens en notatie.'),
     @('Localisation > Timezone', 'Europe/Amsterdam', 'Juiste tijden in de wedstrijdbestanden.'),
@@ -60,8 +100,17 @@ Tbl @('Onderdeel', 'Waarde', 'Waarom') @(
 ) @(3000, 2400, 4238)
 Para 'Herstart de Raspberry Pi wanneer raspi-config daarom vraagt:'
 CodeBlock 'sudo reboot'
+Para 'Liever met de muis? Het schermblanking en het automatisch inloggen stel je ook grafisch in met het **Control Centre**:'
+$s = New-StepList
+Step $s '**Open het Control Centre.** Klik op het framboospictogram linksboven, kies **Preferences** en dan **Control Centre** (pijl 8).'
+Shot 'install-3.2-controlecentrum-menu' 'Het menu Preferences met het Control Centre (8).'
+Shot 'install-3.2-controlecentrum' 'Het Control Centre met links de onderdelen. Scroll in de lijst om de overige onderdelen te zien.'
+Step $s '**Schermblanking uit.** Kies links **Display** en zet **Screen Blanking** uit (de schakelaar staat dan links, in het grijs).'
+Shot 'install-3.2-schermblanking' 'Display: Screen Blanking staat uit.'
+Step $s '**Autologin aan.** Kies links **System**. Zet **Boot** op **To Desktop** en zet **Desktop auto login** aan. Via **Change Hostname...** in dit scherm geef je de Raspberry Pi ook zijn herkenbare naam.'
+Shot 'install-3.2-systeem' 'System: Boot staat op To Desktop en Desktop auto login staat aan.'
 
-H2 '3.2 Systeem bijwerken'
+H2 '3.3 Systeem bijwerken'
 CodeBlock @'
 sudo apt update
 sudo apt full-upgrade -y
@@ -87,8 +136,8 @@ nmcli device wifi connect "NAAM-VAN-WIFI" password "WIFI-WACHTWOORD"
 Callout 'warn' 'Wachtwoorden' 'Zet wifi-wachtwoorden niet in deze handleiding of in het project. Het nmcli-commando blijft in de shellgeschiedenis staan; stel wifi bij voorkeur in met Raspberry Pi Imager.'
 H2 '4.3 Verbinden via SSH'
 Para 'Open PowerShell op je pc en maak verbinding:'
-CodeBlock 'ssh user@sk-box.local'
-Para 'Werkt de naam `sk-box.local` niet, gebruik dan het IP-adres:'
+CodeBlock 'ssh user@SK-Box.local'
+Para 'Werkt de naam `SK-Box.local` niet, gebruik dan het IP-adres:'
 CodeBlock 'ssh user@<IP-adres>'
 
 H1 '5. Benodigde software installeren'
@@ -105,6 +154,7 @@ python3 -c "from PIL import Image, ImageTk; print('Pillow OK')"
 python3 -c "import serial; print('pyserial OK')"
 bluetoothctl --version
 '@
+Shot 'install-5-controle' 'De controleopdrachten: Tkinter OK, Pillow OK en pyserial OK.'
 
 H1 '6. Programmabestanden op de SK-Box zetten'
 H2 '6.1 Doelmap maken'
@@ -114,7 +164,19 @@ mkdir -p "$HOME/ScoreKrijt"
 chmod 755 "$HOME/ScoreKrijt"
 '@
 H2 '6.2 Kopiëren via USB'
-Para ('Kopieer de volledige inhoud van de map ' + $MapC + ' naar de map `ScoreKrijt` op de Raspberry Pi. Controleer daarna of de volgende bestanden bestaan:')
+Para 'Breng de programmabestanden met een USB-stick van je pc naar de SK-Box. Eerst zet je ze op de stick:'
+$s = New-StepList
+Step $s ('**Kopieer de bestanden.** Open op je pc de map ' + $MapC + ' in de uitgepakte download (hoofdstuk 2.1) en selecteer alle onderdelen (pijl 4): `ScoreKrijt`, `ScoreKrijt.py`, `ScoreKrijt.spec`, `scorekrijt_launcher.py` en `ScoreKrijtSettings.json`. Klik met de rechtermuisknop op de selectie en kies **Kopiëren** (pijl 5).')
+Shot 'install-6.2-kopieren' 'Alle onderdelen van de programmamap selecteren (4) en kopiëren (5).'
+Step $s '**Open de USB-stick** en daarin de map `ScoreKrijt_update`. Bestaat die map nog niet, maak hem dan aan.'
+Shot 'install-6.2-usbstick' 'De USB-stick met de map `ScoreKrijt_update`.'
+Step $s '**Plak de bestanden.** Klik met de rechtermuisknop in de lege map (pijl 6) en kies **Plakken** (pijl 7).'
+Shot 'install-6.2-plakken' 'Met de rechtermuisknop in de map (6) en Plakken (7) komen de bestanden op de stick.'
+Step $s '**Zet ook de hulpscripts op de stick.** Kopieer op dezelfde manier de hele map `SK-Box_scripts` uit de map `Phyton` van de download naar de hoofdmap van de stick, naast `ScoreKrijt_update`. De twee scripts daarin heb je later nodig (hoofdstuk 6.4). Gebruik daarna **Hardware veilig verwijderen** in Windows voordat je de stick uit de pc haalt.'
+Shot 'install-6.2-scripts' 'De USB-stick met de mappen `ScoreKrijt_update` en `SK-Box_scripts`.'
+Step $s '**Zet de bestanden op de SK-Box.** Steek de stick in de SK-Box. Er verschijnt de melding **Removable medium is inserted**; klik op **OK** (pijl 11) om de bestandsbeheerder te openen. Kopieer daarin de volledige inhoud van de map `ScoreKrijt_update` naar de map `ScoreKrijt` in de thuismap. De scripts uit `SK-Box_scripts` zet je daarna neer zoals in hoofdstuk 6.4. Draait ScoreKrijt al op de SK-Box en zie je geen taakbalk, druk dan op **F12** om de taakbalk te tonen (zie hoofdstuk 13.5).'
+Shot 'install-6.2-sk-usb-melding' 'De melding bij het insteken van de stick: klik op OK (11).'
+Para 'Controleer daarna op de SK-Box of de volgende bestanden bestaan:'
 CodeBlock @'
 cd "$HOME/ScoreKrijt"
 ls -la
@@ -123,20 +185,22 @@ test -f scorekrijt_launcher.py && echo "launcher OK"
 test -f ScoreKrijtSettings.json && echo "instellingen OK"
 test -d ScoreKrijt/icons && echo "icons OK"
 '@
+Shot 'install-6.2-controle' 'De inhoud van de map ScoreKrijt met de eerste controle (ScoreKrijt.py OK).'
 H2 '6.3 Alternatief: kopiëren via SCP'
 Para ('Open PowerShell op je pc, ga naar de map ' + $MapC + ' en voer uit:')
 CodeBlock @'
-$box = "user@sk-box.local"
+$box = "user@SK-Box.local"
 scp -r ScoreKrijt ScoreKrijt.py scorekrijt_launcher.py ScoreKrijtSettings.json "${box}:ScoreKrijt/"
 '@
 Callout 'info' 'Mapstructuur' 'Kopieer de hele inhoud van de programmamap, niet alleen `ScoreKrijt.py`. De submap `ScoreKrijt` (met de iconen), de launcher en `ScoreKrijtSettings.json` zijn allemaal nodig.'
 H2 '6.4 Hulpscripts op de SK-Box zetten'
-Para 'In de map `Phyton\SK-Box_scripts` staan twee hulpscripts. Zet ze nu alvast op de SK-Box, want je hebt ze later nodig zonder internet:'
+Para 'In de map `Phyton\SK-Box_scripts` staan twee hulpscripts. Je hebt ze in hoofdstuk 6.2 al op de USB-stick gezet. Zet ze nu alvast op de SK-Box, want je hebt ze later nodig zonder internet:'
 Tbl @('Script', 'Doel', 'Beschreven in') @(
     @('`sk-stille-opstart.sh`', 'Verbergt de Raspberry Pi-logo''s en opstarttekst en zet wifi uit.', 'Hoofdstuk 13 en 14'),
     @('`sk-update.sh`', 'Werkt ScoreKrijt bij vanaf een USB-stick.', 'Handleiding SK-Box bijwerken')
 ) @(2900, 4538, 2200)
-Para 'Kopieer beide bestanden met de bestandsbeheerder van de stick naar de thuismap van de SK-Box, of via SCP vanaf je pc. Start ze daarna altijd met `bash` ervoor, zoals in deze handleiding. Bestanden die via een USB-stick of Windows zijn gekopieerd, hebben vaak geen uitvoerrecht en geven dan foutcode 126 (Permission denied). Het uitvoerrecht zet je zo alsnog:'
+Shot 'install-6.4-scripts-plakken' 'De scripts plakken in de thuismap met Paste (12).'
+Para 'Kopieer beide bestanden met de bestandsbeheerder van de stick naar de thuismap van de SK-Box, of via SCP vanaf je pc. Open met de stick in de SK-Box de map `SK-Box_scripts`, selecteer de twee scripts en kopieer ze. Open daarna de thuismap, klik met de rechtermuisknop in een lege plek en kies **Paste** (pijl 12). Start ze daarna altijd met `bash` ervoor, zoals in deze handleiding. Bestanden die via een USB-stick of Windows zijn gekopieerd, hebben vaak geen uitvoerrecht en geven dan foutcode 126 (Permission denied). Het uitvoerrecht zet je zo alsnog:'
 CodeBlock @'
 chmod +x ~/sk-update.sh ~/sk-stille-opstart.sh
 ls -l ~/sk-*.sh
@@ -191,6 +255,7 @@ RestartSec=2
 [Install]
 WantedBy=graphical.target
 '@
+Shot 'install-8.2-nano-service' 'Het servicebestand in nano. Sla op met Ctrl+O en Enter en sluit af met Ctrl+X.'
 Step $s '**Activeer de service** en start de Raspberry Pi opnieuw op:'
 CodeBlock @'
 sudo systemctl daemon-reload
@@ -203,6 +268,7 @@ systemctl status scorekrijt-pairing.service --no-pager
 bluetoothctl show
 '@
 Step $s 'Bij `bluetoothctl show` moeten **Powered**, **Discoverable** en **Pairable** op `yes` staan.'
+Shot 'install-8.2-bluetoothctl-show' 'De uitvoer van bluetoothctl show met Powered, Discoverable en Pairable op yes.'
 Step $s '**Koppel de telefoon.** Open op de telefoon de Bluetooth-instellingen en kies de SK-Box. Op de SK-Box verschijnt geen bevestigingsvenster; op de telefoon kan wel een koppelingsmelding verschijnen.'
 Step $s '**Controleer of de koppeling is opgeslagen.** Voer na het koppelen uit op de SK-Box. De telefoon moet in de lijst staan:'
 CodeBlock 'bluetoothctl devices Paired'
@@ -318,7 +384,10 @@ CodeBlock 'bash ~/sk-stille-opstart.sh'
 Para 'Wil je meteen ook wifi uitzetten (zie hoofdstuk 14), gebruik dan:'
 CodeBlock 'bash ~/sk-stille-opstart.sh --wifi-uit'
 Para 'Wil je het opstarten ongeveer drie seconden korter maken, voeg dan `--sneller` toe. Het script zet dan `cloud-init` uit, het installatieprogramma voor de allereerste start van de Pi. Dat is optioneel; met `--terugdraaien` staat het weer aan.'
-Para 'Het script laat zien wat het gaat wijzigen en vraagt eerst om bevestiging. Start daarna opnieuw op:'
+Para 'Het script laat zien wat het gaat wijzigen en vraagt eerst om bevestiging. Typ **j** en druk op Enter om door te gaan; met alleen Enter breekt het script af en blijft alles zoals het was.'
+Shot 'install-13.2-script' 'De bevestigingsvraag van het script, hier beantwoord met j.'
+Para 'Aan het eind meldt het script wat het heeft gewijzigd en hoe je het terugdraait. Start daarna opnieuw op:'
+Shot 'install-13.2-script-klaar' 'Het slot van het script, met de aanwijzing om opnieuw op te starten.'
 CodeBlock 'sudo reboot'
 Callout 'warn' 'SSH via wifi stopt met werken' 'Met `--wifi-uit` kun je de SK-Box niet meer via wifi bereiken. Controleer eerst of ScoreKrijt en Bluetooth goed werken en zorg dat je een toetsenbord hebt aangesloten voor het geval je iets wilt aanpassen (zie hoofdstuk 14.3).'
 H2 '13.3 Handmatig doorvoeren'
@@ -358,7 +427,7 @@ Para 'Met het script zet je alles terug, ook het wifi-gebruik:'
 CodeBlock 'bash ~/sk-stille-opstart.sh --terugdraaien'
 Para 'Start de SK-Box na een foutieve aanpassing niet meer op, dan kun je de kopieën met de hand terugzetten:'
 $s = New-StepList
-Step $s 'Schakel de SK-Box uit en haal de microSD-kaart eruit.'
+Step $s 'Schakel de SK-Box uit en haal de microSD-kaart eruit. Bij de geprinte SK-Box haal je eerst de Raspberry Pi uit de behuizing (zie hoofdstuk 2.2). De kaart haal je alleen voor dit herstel uit de Raspberry Pi.'
 Step $s 'Steek de kaart in een pc met Windows. Er verschijnt een schijf met de naam **bootfs** (of **boot**; de overige delen van de kaart kan Windows niet lezen; daar hoef je niets mee).'
 Step $s 'Verwijder `cmdline.txt` en hernoem `cmdline.txt.sk-origineel` naar `cmdline.txt`. Doe hetzelfde voor `config.txt`.'
 Step $s 'Zet de kaart terug in de SK-Box en start op.'
@@ -367,7 +436,9 @@ H2 '13.5 De taakbalk tijdelijk tonen (F12)'
 Para 'Zonder taakbalk kom je niet makkelijk bij het bureaublad, bijvoorbeeld om een USB-stick te openen of een Terminal te starten. Met een toetsenbord aan de SK-Box doe je dat zo:'
 $s = New-StepList
 Step $s 'Druk op **F12** terwijl het scorebord in beeld is. Het scorebord verlaat het volledige scherm en de taakbalk verschijnt. Staat het grote scherm niet aan en zie je het gewone ScoreKrijt-venster, druk dan in dat venster op **F12**; de taakbalk verschijnt dan naast het venster.'
-Step $s 'Werk met de taakbalk, bijvoorbeeld een Terminal of de bestandsbeheerder.'
+Shot 'install-13.5-taakbalk' 'Het scorebord met de taakbalk bovenaan na het drukken op F12, met onder meer de bestandsbeheerder en de Terminal.'
+Step $s 'Werk met de taakbalk, bijvoorbeeld een Terminal of de bestandsbeheerder. Voor een Terminal klik je op het zwarte pictogram met de prompt (pijl 9); het Terminalvenster opent daarna (pijl 10).'
+Shot 'install-13.5-terminal' 'Een Terminal starten vanaf de taakbalk (9); het venster opent in beeld (10).'
 Step $s 'Druk opnieuw op **F12**. De taakbalk verdwijnt. Het scorebord vult weer het hele scherm, als het grote scherm aan staat.'
 Callout 'info' 'Hulp als F12 niets doet' 'F12 werkt alleen als het scorebord of het gewone ScoreKrijt-venster het actieve venster is en de taakbalk op deze SK-Box is geïnstalleerd (`wf-panel-pi`). Lukt het niet, gebruik dan Ctrl+Alt+F2 voor een tekstscherm (hoofdstuk 14.3).'
 
@@ -406,7 +477,7 @@ Step $s 'Keer terug met **Ctrl+Alt+F1**, of start de SK-Box opnieuw op met `sudo
 Callout 'info' 'Inloggegevens' 'De gebruikersnaam van de SK-Box is `user` en het wachtwoord is `user`. Verander je het wachtwoord, bewaar het dan op een veilige plek, bijvoorbeeld in de beheerdersmap van de club. Zonder die gegevens kun je de SK-Box niet meer bijwerken.'
 H2 '14.4 Updates zonder internet'
 Bullet '**ScoreKrijt zelf:** bijwerken met een USB-stick en het script `sk-update.sh`. Zie de handleiding **SK-Box bijwerken**.'
-Bullet '**Raspberry Pi OS:** hoeft niet bijgewerkt te worden voor een gesloten scorebord. Wil je dat toch, zet dan tijdelijk wifi aan (`sudo nmcli radio wifi on`), voer hoofdstuk 3.2 uit en zet wifi daarna weer uit.'
+Bullet '**Raspberry Pi OS:** hoeft niet bijgewerkt te worden voor een gesloten scorebord. Wil je dat toch, zet dan tijdelijk wifi aan (`sudo nmcli radio wifi on`), voer hoofdstuk 3.3 uit en zet wifi daarna weer uit.'
 
 H1 '15. Eindcontrole'
 Para 'Loop onderstaande punten na. Alles moet werken zonder toetsenbord of muis.'
@@ -493,7 +564,7 @@ Callout 'info' 'Telefoonapp en SK-Box' 'Controleer in hoofdstuk 8 of ook de Andr
 Callout 'info' 'Drie manieren om bij te werken' 'Hoofdstuk 3: met een USB-stick en het updatescript (aanbevolen). Hoofdstuk 4: met een USB-stick zonder script, met de hand. Hoofdstuk 5: via het netwerk met SSH, alleen als de SK-Box tijdelijk met een netwerk is verbonden.'
 
 H1 '2. De nieuwe versie klaarzetten op je pc'
-Para ('Gebruik de map ' + $MapC + '. Je kopieert daaruit **alleen** de onderstaande onderdelen naar de SK-Box:')
+Para ('Haal de nieuwe versie eerst op van GitHub, zoals beschreven in de installatiehandleiding, hoofdstuk 2.1. Gebruik daarna de map ' + $MapC + '. Je kopieert daaruit **alleen** de onderstaande onderdelen naar de SK-Box:')
 Tbl @('Wel kopiëren', 'Niet kopiëren') @(
     @('`ScoreKrijt` (de map met het programma en de iconen)', '`ScoreKrijtSettings.json`'),
     @('`ScoreKrijt.py`', 'De mappen `matches`, `build` en `dist`'),
@@ -529,6 +600,7 @@ Step $s '**Open een Terminal.** Druk op **Ctrl+Alt+F2** en meld je aan met gebru
 Step $s '**Start het updatescript** (zonder `sudo`):'
 CodeBlock 'bash ~/sk-update.sh'
 Step $s '**Controleer de versies.** Het script toont de huidige en de nieuwe versie. Bevestig met `j` en Enter.'
+Shot 'update-3.1-sk-update' 'Het script vindt de stick, toont de huidige en de nieuwe versie en vraagt om bevestiging.'
 Step $s '**Wacht tot het klaar is.** Het script meldt wanneer de stick veilig kan worden verwijderd en start de SK-Box daarna na tien seconden opnieuw op.'
 Step $s '**Haal de USB-stick uit de SK-Box.** Na het opstarten verschijnt eerst het ScoreKrijt-opstartscherm en daarna het grote ScoreKrijt-scherm.'
 Callout 'info' 'Het script staat er nog niet?' 'Het script moet eenmalig op de SK-Box zijn gezet (installatiehandleiding, hoofdstuk 6.4). Is dat niet gebeurd, gebruik dan hoofdstuk 4; daar kopieer je het script ook naar de SK-Box.'
@@ -597,7 +669,7 @@ H1 '5. Bijwerken via het netwerk (SSH)'
 Para 'Gebruik deze manier alleen als de SK-Box tijdelijk met een netwerk is verbonden. De update bestaat uit acht stappen. Bij elke stap staat of je de opdrachten op de **SK-Box** (in een SSH-sessie of Terminal) of op je **pc** (in PowerShell) uitvoert.'
 H2 '5.1 Verbinden met de SK-Box'
 Para 'Open PowerShell op je pc en maak verbinding:'
-CodeBlock 'ssh user@sk-box.local'
+CodeBlock 'ssh user@SK-Box.local'
 Para 'Je ziet nu de opdrachtregel van de Raspberry Pi. De stappen 5.2 en 5.3 voer je in deze SSH-sessie uit. Laat het venster open staan.'
 H2 '5.2 De huidige versie noteren'
 Para 'Voer uit op de SK-Box:'
@@ -617,14 +689,14 @@ Para 'De laatste opdracht moet niets tonen. Het scherm van de SK-Box wordt leeg 
 H2 '5.4 Een back-up van de wedstrijden maken'
 Para 'Dit is optioneel, maar aan te raden. Open een **tweede PowerShell-venster op je pc** en laat de SSH-sessie open staan. De variabele `$box` bewaart de verbindingsnaam, zodat de opdrachten kort blijven. Kopieer de wedstrijden en instellingen naar de huidige map op je pc:'
 CodeBlock @'
-$box = "user@sk-box.local"
+$box = "user@SK-Box.local"
 scp -r "${box}:ScoreKrijt/matches" ./matches-backup
 scp "${box}:ScoreKrijt/ScoreKrijtSettings.json" ./instellingen-backup.json
 '@
 H2 '5.5 De nieuwe bestanden uploaden'
 Para ('Voer uit in PowerShell op je pc. Ga eerst naar de nieuwe programmamap, bijvoorbeeld ' + $MapC + '. De bestanden gaan naar een tijdelijke map, zodat de huidige installatie intact blijft:')
 CodeBlock @'
-$box = "user@sk-box.local"
+$box = "user@SK-Box.local"
 ssh $box "mkdir -p ~/ScoreKrijt_nieuw"
 scp -r ScoreKrijt ScoreKrijt.py scorekrijt_launcher.py "${box}:ScoreKrijt_nieuw/"
 '@
@@ -689,7 +761,7 @@ Bullet '**Zelfde protocolnummer:** telefoon en SK-Box mogen een verschillende pr
 Bullet '**Ander protocolnummer:** de app toont de melding **SK-Box-versie niet compatibel** en vermeldt welk onderdeel moet worden bijgewerkt. Werk dat onderdeel bij.'
 H2 '8.2 De app installeren'
 $s = New-StepList
-Step $s 'Zet het nieuwe APK-bestand op de telefoon, bijvoorbeeld via USB of een gedeelde map.'
+Step $s 'Zet het nieuwe APK-bestand op de telefoon, bijvoorbeeld via USB of een gedeelde map. Het bestand staat in de map `Android` van de download van GitHub (installatiehandleiding, hoofdstuk 2.1).'
 Step $s 'Open het bestand op de telefoon en kies **Installeren** of **Bijwerken**. Geef zo nodig eenmalig toestemming om apps uit deze bron te installeren.'
 Step $s 'Start de app en verbind met de SK-Box. Je lopende wedstrijd en je gekoppelde SK-Box blijven behouden.'
 Callout 'warn' 'Gebruik steeds hetzelfde soort APK' 'Android accepteert een update alleen als het nieuwe APK-bestand met dezelfde sleutel is ondertekend als de geïnstalleerde app. Geeft Android een melding dat de app niet kan worden geïnstalleerd, dan is dat meestal de oorzaak. Verwijderen en opnieuw installeren lost het op, maar wist ook de lokaal opgeslagen gegevens, zoals een lopende wedstrijd en het laatste wedstrijdoverzicht.'
@@ -721,7 +793,7 @@ Terugdraaien:  bash ~/sk-update.sh --terug
 Para '**Via het netwerk.**' '' '<w:keepNext/>'
 Para '**Op je pc (PowerShell, in de nieuwe programmamap):**'
 CodeBlock @'
-$box = "user@sk-box.local"
+$box = "user@SK-Box.local"
 ssh $box "mkdir -p ~/ScoreKrijt_nieuw"
 scp -r ScoreKrijt ScoreKrijt.py scorekrijt_launcher.py "${box}:ScoreKrijt_nieuw/"
 '@
@@ -886,4 +958,9 @@ foreach ($d in @($out1, $out2, $out3)) {
     $pdf = [System.IO.Path]::ChangeExtension($d, '.pdf')
     $pages = Update-InWord -DocPath $d -PdfPath $pdf
     "{0}: {1} pagina's" -f (Split-Path $d -Leaf), $pages
+}
+
+$ontbreekt = @($script:missingShots | Sort-Object -Unique)
+if ($ontbreekt.Count -gt 0) {
+    "Nog te maken afbeeldingen in Screenshots ({0}): {1}" -f $ontbreekt.Count, ($ontbreekt -join ', ')
 }
