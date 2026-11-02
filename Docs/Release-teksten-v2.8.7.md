@@ -162,7 +162,7 @@ ScoreKrijt was made with the help of AI (Claude by Anthropic). The requirements,
 
 ## 3. Nog te regelen voor de winkel
 
-Dit staat hier als checklist; controleer de actuele eisen van Google Play zelf, want die veranderen regelmatig.
+De bijgewerkte, uitgebreide checklist staat in [`Play-Store-checklist.md`](Play-Store-checklist.md). Hieronder het oorspronkelijke overzicht; controleer de actuele eisen van Google Play zelf, want die veranderen regelmatig.
 
 - **Pakketnaam:** de app heet nu `com.example.scorekrijtapp`. Google Play accepteert geen pakketnamen die met
   `com.example` beginnen. Kies vóór de eerste upload een eigen naam (bijvoorbeeld op basis van een domein dat je beheert)
