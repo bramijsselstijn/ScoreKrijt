@@ -53,7 +53,7 @@ Step $s '**Klik op de groene knop Code** (pijl 1) en kies **Download ZIP** (pijl
 Shot 'install-2.1-github-download' 'De projectpagina op GitHub: eerst de groene knop Code (1), daarna Download ZIP (2).'
 Step $s '**Pak het ZIP-bestand uit.** Zoek `ScoreKrijt-main.zip` in je map Downloads, klik er met de rechtermuisknop op en kies **Alles uitpakken** (pijl 3). Kies een map die je terugvindt, bijvoorbeeld Documenten.'
 Shot 'install-2.1-uitpakken' 'Het ZIP-bestand uitpakken met Alles uitpakken (3).'
-Step $s ('**Controleer de inhoud.** In de uitgepakte map staat de map `Phyton`. De programmamap ' + $MapC + ' daarin gebruik je in de rest van deze handleiding. De map `Phyton\SK-Box_scripts` bevat de twee hulpscripts en in de map `Android` staat de APK van de telefoonapp.')
+Step $s ('**Controleer de inhoud.** In de uitgepakte map staat de map `Phyton`. De programmamap ' + $MapC + ' daarin gebruik je in de rest van deze handleiding. De map `Phyton\SK-Box_scripts` bevat de twee hulpscripts. De APK van de telefoonapp staat niet in deze download.')
 Callout 'info' 'Liever met Git?' 'Heb je Git op je pc, dan kan het ook met `git clone https://github.com/bramijsselstijn/ScoreKrijt.git`. Voor de SK-Box is de ZIP-download voldoende.'
 
 H2 '2.2 De Raspberry Pi uit de geprinte SK-Box halen'
@@ -767,7 +767,7 @@ Bullet '**Zelfde protocolnummer:** telefoon en SK-Box mogen een verschillende pr
 Bullet '**Ander protocolnummer:** de app toont de melding **SK-Box-versie niet compatibel** en vermeldt welk onderdeel moet worden bijgewerkt. Werk dat onderdeel bij.'
 H2 '8.2 De app installeren'
 $s = New-StepList
-Step $s 'Zet het nieuwe APK-bestand op de telefoon, bijvoorbeeld via USB of een gedeelde map. Het bestand staat in de map `Android` van de download van GitHub (installatiehandleiding, hoofdstuk 2.1).'
+Step $s 'Zet het nieuwe APK-bestand op de telefoon, bijvoorbeeld via USB of een gedeelde map.'
 Step $s 'Open het bestand op de telefoon en kies **Installeren** of **Bijwerken**. Geef zo nodig eenmalig toestemming om apps uit deze bron te installeren.'
 Step $s 'Start de app en verbind met de SK-Box. Je lopende wedstrijd en je gekoppelde SK-Box blijven behouden.'
 Callout 'warn' 'Gebruik steeds hetzelfde soort APK' 'Android accepteert een update alleen als het nieuwe APK-bestand met dezelfde sleutel is ondertekend als de geïnstalleerde app. Geeft Android een melding dat de app niet kan worden geïnstalleerd, dan is dat meestal de oorzaak. Verwijderen en opnieuw installeren lost het op, maar wist ook de lokaal opgeslagen gegevens, zoals een lopende wedstrijd en het laatste wedstrijdoverzicht.'

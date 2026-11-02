@@ -10,9 +10,8 @@
 !/Docs/
 !/Phyton/
 
-# --- Android: de broncode blijft lokaal (Google Drive); alleen de nieuwste APK staat op GitHub ---
+# --- Android: de broncode en de APK-bestanden blijven lokaal (Google Drive); er staat niets van de Android-app op GitHub ---
 /Android/*
-# (de APK-uitzondering staat onderaan, na de regel *.apk)
 
 # --- Python (SK-Box): alleen de huidige versie ---
 /Phyton/*
@@ -53,5 +52,3 @@ desktop.ini
 *.apk
 *.keystore
 *.jks
-# Uitzondering: de nieuwste APK (bij een nieuwe versie hier het bestand aanpassen)
-!/Android/ScoreKrijt_V2.8.8.apk
