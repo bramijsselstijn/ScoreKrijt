@@ -2,7 +2,7 @@
 
 ## V2.8.9 – Help en spelregels op het hoofdscherm en nieuwe pakketnaam
 
-2.8.8 is al uitgebracht (tag `v2.8.8`), dus deze versie is 2.8.9: hoger dan de laatste en lager dan V2.9. Alleen de Android-app is gewijzigd; de SK-Box blijft ongewijzigd (code 2.8.7.1) en het Bluetooth-protocol blijft versie 2. Door de gebruiker getest op een telefoon op 2 november 2026.
+Door de gebruiker getest op een telefoon op 2 november 2026.
 
 ### Android-app
 
