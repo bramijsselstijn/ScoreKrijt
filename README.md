@@ -26,3 +26,7 @@ Elke versie krijgt een tag (bijvoorbeeld `v2.8.7`). Van de Android-app staat all
 ## De SK-Box installeren en bijwerken
 
 Zie de handleidingen in `Docs/`. De SK-Box heeft geen internet nodig: een nieuwe versie van ScoreKrijt wordt met een USB-stick en het script `sk-update.sh` geïnstalleerd.
+
+## Licentie
+
+ScoreKrijt is vrije software onder de [GNU General Public License versie 3](LICENSE) (GPL-3.0). Je mag het gebruiken, aanpassen en delen, maar een aangepaste versie die je verspreidt moet je onder dezelfde licentie met de broncode delen.
