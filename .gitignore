@@ -35,7 +35,8 @@ matches/
 !/SK-Box/Base-Part.STL
 !/SK-Box/Part3^Assem1.STL
 
-# --- Handleidingen: alleen pdf's (en bouwscripts); .docx blijft lokaal ---
+# --- Handleidingen: alleen pdf's; .docx en de .ps1-bouwscripts blijven lokaal ---
+*.ps1
 *.docx
 /Docs/.skbox_*/
 /Docs/rendered_handleiding/
