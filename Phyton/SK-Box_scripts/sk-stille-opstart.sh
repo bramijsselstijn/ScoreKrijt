@@ -10,12 +10,14 @@
 #   bash sk-stille-opstart.sh --sneller       ook cloud-init uitzetten (ongeveer 3 seconden sneller)
 #   bash sk-stille-opstart.sh --terugdraaien  alles terugzetten zoals het was
 # Opties:
+#   --resolutie=BREEDTExHOOGTE  schermresolutie vastzetten (standaard 1920x1080)
+#   --geen-resolutie            de schermresolutie niet vastzetten
 #   --ja     geen bevestigingen vragen
 #   --help   deze uitleg tonen
 #
 # Wat dit script wijzigt (van alle bestanden wordt eenmalig een kopie bewaard
 # met de extensie .sk-origineel):
-#   <boot>/cmdline.txt            opstartparameters
+#   <boot>/cmdline.txt            opstartparameters en schermresolutie (video=HDMI-A-1:...)
 #   /usr/share/plymouth/themes/pix/splash.png  zet het ScoreKrijt-logo in het opstartscherm
 #   <boot>/config.txt             schakelt het regenboogscherm van de firmware uit
 #   /etc/cloud/cloud-init.disabled  alleen met --sneller: zet cloud-init uit
@@ -29,6 +31,7 @@ MODUS="doorvoeren"
 WIFI_UIT=0
 SNEL=0
 JA=0
+RESOLUTIE="1920x1080"
 MARKER="# ScoreKrijt stille opstart"
 LABWC_MARKER="# sk-stil: "
 
@@ -43,6 +46,12 @@ for arg in "$@"; do
     --wifi-uit)     WIFI_UIT=1 ;;
     --sneller)      SNEL=1 ;;
     --ja)           JA=1 ;;
+    --geen-resolutie) RESOLUTIE="" ;;
+    --resolutie=*)  RESOLUTIE="${arg#--resolutie=}"
+                    case "$RESOLUTIE" in
+                      [0-9]*x[0-9]*) ;;
+                      *) fout "Ongeldige resolutie: $RESOLUTIE (gebruik bijvoorbeeld --resolutie=1920x1080)" ;;
+                    esac ;;
     --help|-h)      uitleg; exit 0 ;;
     *)              fout "Onbekende optie: $arg (zie --help)" ;;
   esac
@@ -189,6 +198,7 @@ doorvoeren() {
   info "Dit script past het opstarten van de SK-Box aan."
   info "  - opstartbestanden: $CMD en $CFG"
   info "  - bureaublad:       $LABWC_SYS (alleen als labwc wordt gebruikt)"
+  [ -n "$RESOLUTIE" ] && info "  - schermresolutie:  wordt vastgezet op $RESOLUTIE (via $CMD)"
   [ "$WIFI_UIT" -eq 1 ] && info "  - wifi:             wordt uitgezet (SSH via wifi werkt daarna niet meer)"
   ja_nee "Doorgaan?" || { info "Afgebroken. Er is niets gewijzigd."; exit 0; }
 
@@ -204,11 +214,15 @@ doorvoeren() {
   for w in $regel; do
     case "$w" in
       splash|loglevel=*|plymouth.enable=*) continue ;;
+      video=HDMI-A-*) [ -n "$RESOLUTIE" ] && continue ;;
       console=tty1)                         w="console=tty3" ;;
     esac
     nieuw="$nieuw $w"
   done
   extra="quiet loglevel=3 logo.nologo vt.global_cursor_default=0"
+  # Resolutie vastzetten, zodat de Pi bij een scherm van 2K of 4K niet zelf hoger kiest
+  # (dat kost veel geheugen). Een poort die niet bestaat of niet gebruikt wordt, wordt genegeerd.
+  [ -n "$RESOLUTIE" ] && extra="$extra video=HDMI-A-1:${RESOLUTIE}@60 video=HDMI-A-2:${RESOLUTIE}@60"
   if [ "$PLY_OK" -eq 1 ]; then extra="$extra splash"; else extra="$extra plymouth.enable=0"; fi
   for w in $extra; do
     case " $nieuw " in *" $w "*) ;; *) nieuw="$nieuw $w" ;; esac

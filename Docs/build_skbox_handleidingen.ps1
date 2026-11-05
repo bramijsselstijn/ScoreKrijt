@@ -118,6 +118,23 @@ sudo reboot
 '@
 Callout 'info' 'Waarom Desktop-autologin?' 'Een systeemdienst zonder grafische sessie kan een Tkinter-venster niet betrouwbaar op het HDMI-scherm openen. ScoreKrijt start daarom via de autostart van de ingelogde desktopgebruiker.'
 
+H2 '3.4 Schermresolutie vastzetten op 1080p'
+Para 'Raspberry Pi OS kiest zelf de hoogste resolutie die het scherm doorgeeft. Bij een scherm van 2K of 4K kost dat veel geheugen en verschijnen er meldingen als **High display resolution is using large amounts of memory**. Het scorebord heeft genoeg aan 1080p (1920 x 1080). Leg die resolutie daarom vast, zodat de Raspberry Pi hem niet meer automatisch verhoogt. Op een Raspberry Pi met weinig werkgeheugen scheelt dit merkbaar.'
+$s = New-StepList
+Step $s '**Maak een kopie** van het opstartbestand. Op Raspberry Pi OS Bookworm of nieuwer staat het in `/boot/firmware`; bij oudere versies in `/boot`.'
+CodeBlock 'sudo cp /boot/firmware/cmdline.txt /boot/firmware/cmdline.txt.bak'
+Step $s '**Open `cmdline.txt`:**'
+CodeBlock 'sudo nano /boot/firmware/cmdline.txt'
+Step $s '**Voeg de resolutie toe.** Het bestand bevat **één regel**; maak er geen tweede regel van. Ga naar het einde van die regel en voeg, na een spatie, toe:'
+CodeBlock 'video=HDMI-A-1:1920x1080@60 video=HDMI-A-2:1920x1080@60'
+Step $s 'Sla op met **Ctrl+O** en Enter en sluit af met **Ctrl+X**. Start daarna opnieuw op:'
+CodeBlock 'sudo reboot'
+Step $s '**Controleer de resolutie.** Na de herstart moet dit `1920,1080` tonen:'
+CodeBlock 'cat /sys/class/graphics/fb0/virtual_size'
+Callout 'info' 'Welke HDMI-poort?' '`HDMI-A-1` is de eerste HDMI-poort van de Raspberry Pi (bij een Pi 4 en Pi 5 de poort naast de voedingsaansluiting), `HDMI-A-2` de tweede. Een poort die je niet gebruikt of die niet bestaat, wordt genegeerd. Je mag beide regels dus altijd laten staan.'
+Callout 'info' 'Kent je scherm geen 1080p?' 'Heeft je scherm geen 1920 x 1080-stand, bijvoorbeeld een oud 4:3-scherm, vervang dan `1920x1080` door een resolutie die het scherm wel ondersteunt, zoals `1280x1024`.'
+Callout 'info' 'Terugdraaien of nu al op een hoge resolutie?' 'Haal de woorden `video=HDMI-A-...` uit `cmdline.txt` weg om de automatische keuze terug te krijgen, of zet de kopie `cmdline.txt.bak` terug. Staat de SK-Box nu al op een te hoge resolutie, dan gelden dezelfde stappen. Het script `sk-stille-opstart.sh` (hoofdstuk 13) zet dezelfde instelling, dus heb je dat al uitgevoerd, dan is dit hoofdstuk niet meer nodig.'
+
 H1 '4. Netwerk en toegang op afstand'
 Para 'Met SSH bedien je de Raspberry Pi vanaf je pc. Je hebt dit nodig voor het kopiëren van bestanden (hoofdstuk 6), het instellen van Bluetooth (hoofdstuk 8) en voor onderhoud zolang de SK-Box met een netwerk is verbonden. Updates installeer je later met een USB-stick.'
 H2 '4.1 Hostnaam en IP-adres controleren'
@@ -375,6 +392,7 @@ Tbl @('Wat je ziet', 'Zonder aanpassing', 'Na de aanpassing') @(
     @('Opstarttekst van Linux', 'Zichtbaar', 'Weg (`quiet`, `loglevel=3`, `console=tty3`)'),
     @('Raspberry Pi-opstartlogo met balk', 'Zichtbaar', 'Vervangen door het ScoreKrijt-logo (`splash`); zonder logo weg (`plymouth.enable=0`)'),
     @('Knipperende cursor', 'Zichtbaar', 'Weg (`vt.global_cursor_default=0`)'),
+    @('Schermresolutie', 'Hoogste resolutie die het scherm opgeeft', 'Vast op 1080p (`video=HDMI-A-1:1920x1080@60`, zie hoofdstuk 3.4)'),
     @('Taakbalk', 'Kort zichtbaar voor ScoreKrijt start', 'Weg uit `/etc/xdg/labwc/autostart`'),
     @('Bureaubladachtergrond', 'Raspberry Pi-achtergrond met pictogrammen', 'Zwart met het ScoreKrijt-logo, zonder pictogrammen')
 ) @(3300, 2900, 3438)
@@ -384,6 +402,7 @@ CodeBlock 'bash ~/sk-stille-opstart.sh'
 Para 'Wil je meteen ook wifi uitzetten (zie hoofdstuk 14), gebruik dan:'
 CodeBlock 'bash ~/sk-stille-opstart.sh --wifi-uit'
 Para 'Wil je het opstarten ongeveer drie seconden korter maken, voeg dan `--sneller` toe. Het script zet dan `cloud-init` uit, het installatieprogramma voor de allereerste start van de Pi. Dat is optioneel; met `--terugdraaien` staat het weer aan.'
+Para 'Het script zet ook de schermresolutie vast op 1080p (zie hoofdstuk 3.4). Heeft je scherm een andere resolutie nodig, geef die dan mee met bijvoorbeeld `--resolutie=1280x720`. Wil je de resolutie niet laten vastzetten, gebruik dan `--geen-resolutie`.'
 Para 'Het script laat zien wat het gaat wijzigen en vraagt eerst om bevestiging. Typ **j** en druk op Enter om door te gaan; met alleen Enter breekt het script af en blijft alles zoals het was.'
 Shot 'install-13.2-script' 'De bevestigingsvraag van het script, hier beantwoord met j.'
 Para 'Aan het eind meldt het script wat het heeft gewijzigd en hoe je het terugdraait. Start daarna opnieuw op:'
@@ -400,7 +419,7 @@ $s = New-StepList
 Step $s '**Open `cmdline.txt`:**'
 CodeBlock 'sudo nano /boot/firmware/cmdline.txt'
 Step $s '**Pas de regel aan.** Het bestand bevat **één regel**; maak er geen tweede regel van. Vervang `console=tty1` door `console=tty3`, haal bestaande woorden `quiet`, `splash` en `loglevel=...` weg en voeg achteraan, na een spatie, toe:'
-CodeBlock 'quiet loglevel=3 logo.nologo vt.global_cursor_default=0 splash'
+CodeBlock 'quiet loglevel=3 logo.nologo vt.global_cursor_default=0 video=HDMI-A-1:1920x1080@60 video=HDMI-A-2:1920x1080@60 splash'
 Para 'Wil je tijdens het opstarten geen logo maar een zwart scherm, laat dan `splash` weg en voeg `plymouth.enable=0` toe. Voor het ScoreKrijt-logo vervang je het bestand `/usr/share/plymouth/themes/pix/splash.png` door een verkleind logo (het logo `ScoreKrijt Logo.png`, verkleind tot 480 x 480 pixels) en voer je daarna `sudo update-initramfs -u` uit als er een bestand `initramfs` in `/boot/firmware` staat. Het script doet dit allemaal voor je.'
 Step $s '**Open `config.txt`** en voeg onderaan toe:'
 CodeBlock @'
@@ -483,6 +502,7 @@ H1 '15. Eindcontrole'
 Para 'Loop onderstaande punten na. Alles moet werken zonder toetsenbord of muis.'
 Check 'De Raspberry Pi meldt zichzelf automatisch aan op de Desktop.'
 Check 'Het scherm wordt niet zwart bij inactiviteit.'
+Check 'Het scherm staat op 1080p: `cat /sys/class/graphics/fb0/virtual_size` toont `1920,1080` (hoofdstuk 3.4).'
 Check 'Het ScoreKrijt-opstartscherm met "SK-Box wordt gestart" blijft staan tot het scorebord klaar is.'
 Check 'Het grote scorebord opent op het volledige scherm.'
 Check 'De services `bluetooth`, `scorekrijt-pairing` en `scorekrijt-rfcomm` zijn actief.'
@@ -511,6 +531,7 @@ Tbl @('Probleem', 'Controle', 'Oplossing') @(
     @('Datum en tijd kloppen niet', 'Geen netwerktijd', 'Stel de tijd handmatig in (hoofdstuk 14.2).'),
     @('Geen volledig scherm', 'Autologin en `.desktop`-bestand', 'Test de launcher handmatig vanaf de Desktop.'),
     @('Scherm wordt zwart', 'Screen Blanking', 'Zet dit uit via `raspi-config`.'),
+    @('Melding over veel geheugengebruik door de schermresolutie', 'Scherm staat hoger dan 1080p', 'Zet de resolutie vast op 1080p (hoofdstuk 3.4).'),
     @('Geen `/dev/rfcomm0`', 'RFCOMM-service en verbinding', 'Controleer `journalctl` en verbind vanuit de app.'),
     @('Permission denied', 'Groep van de poort', 'Voeg de gebruiker toe aan `dialout` en herstart.'),
     @('SK-Box niet zichtbaar op de telefoon', 'Koppelservice', 'Controleer met `systemctl status scorekrijt-pairing.service --no-pager` of de service draait en met `bluetoothctl show` of Powered, Discoverable en Pairable op `yes` staan.'),
