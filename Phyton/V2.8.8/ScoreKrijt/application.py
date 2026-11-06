@@ -92,7 +92,9 @@ class Application(tk.Tk):
         self.bind('<Control-N>', self.new_match)
         
         self.bind('<Return>', self.note_and_next_turn)
-        self.bind('<F12>', lambda event: self.toggle_taskbar())
+        # bind_all: F12 werkt in elk ScoreKrijt-venster (hoofdvenster, groot scherm, dialogen),
+        # ook als het toetsenbord na het sluiten van het grote scherm in een ander venster staat.
+        self.bind_all('<F12>', lambda event: self.toggle_taskbar())
         self.bind('p', self.increment_current_car)
         self.bind('+', self.increment_current_car)
         self.bind('-', self.decrement_current_car)
@@ -376,18 +378,44 @@ class Application(tk.Tk):
         screen = self.big_screen
         if screen is not None and not screen.winfo_exists():
             screen = None
-        running = subprocess.run(["pgrep", "-x", "wf-panel-pi"],
-                                 stdout=subprocess.DEVNULL).returncode == 0
-        if running:
+        proc = getattr(self, "_panel_process", None)
+        if self._panel_running():
             subprocess.run(["pkill", "-x", "wf-panel-pi"])
+            # Ruim het gestopte proces op. Een afgesloten maar niet opgeruimd proces
+            # (zombie) blijft voor pgrep "draaiend", waardoor de volgende F12 de taakbalk
+            # niet meer zou tonen.
+            if proc is not None:
+                try:
+                    proc.wait(timeout=2)
+                except Exception:
+                    pass
+                self._panel_process = None
             if screen is not None and self.settings['OpenBigScreenFullScreen'].get():
                 screen.attributes("-fullscreen", True)
                 self._keep_big_screen_fullscreen()
         else:
+            if proc is not None:
+                try:
+                    proc.wait(timeout=0.2)
+                except Exception:
+                    pass
             if screen is not None:
                 screen.attributes("-fullscreen", False)
-            subprocess.Popen([panel], start_new_session=True,
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self._panel_process = subprocess.Popen(
+                [panel], start_new_session=True,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    @staticmethod
+    def _panel_running():
+        """True als wf-panel-pi echt draait (een zombie telt niet mee)."""
+        try:
+            result = subprocess.run(["ps", "-C", "wf-panel-pi", "-o", "stat="],
+                                    capture_output=True, text=True)
+            return any(line.strip() and not line.strip().startswith("Z")
+                       for line in result.stdout.splitlines())
+        except (OSError, ValueError):
+            return subprocess.run(["pgrep", "-x", "wf-panel-pi"],
+                                  stdout=subprocess.DEVNULL).returncode == 0
 
     def toggle_big_screen(self, event=None):
 

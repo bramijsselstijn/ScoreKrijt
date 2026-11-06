@@ -378,7 +378,7 @@ class BigScreenView(tk.Toplevel):
         self.title("Score Krijt – Groot Scherm")
 
         self.bind("<F11>", self.toggle_fullscreen)
-        self.bind("<F12>", lambda e: parent.toggle_taskbar())
+        # F12 (taakbalk) is aan het hele programma gebonden (bind_all in application.py).
         self.bind("<Escape>", lambda e: self.close())
         self.protocol("WM_DELETE_WINDOW", self.close)
 
@@ -462,14 +462,30 @@ class BigScreenView(tk.Toplevel):
         self.attributes("-fullscreen", not self.attributes("-fullscreen"))
 
     def close(self):
+        master = self.master
         self.attributes("-fullscreen", False)
         self.destroy()
-    
-        # Toon het normale ScoreKrijt-venster opnieuw.
-        if self.master and self.master.winfo_exists():
-            self.master.deiconify()
-            self.master.lift()
-            self.master.focus_force()
+
+        # Toon het normale ScoreKrijt-venster opnieuw en geef het het toetsenbord, zodat
+        # F12 (taakbalk) en de andere toetsen meteen werken. Op de SK-Box (Wayland/labwc)
+        # gaat het focussen vlak na het sluiten van een volledig scherm soms mis; daarom
+        # wordt het kort daarna nog een paar keer herhaald.
+        def show_main():
+            try:
+                if master and master.winfo_exists():
+                    master.deiconify()
+                    master.lift()
+                    master.focus_force()
+            except tk.TclError:
+                pass
+
+        if master:
+            show_main()
+            for delay in (150, 600):
+                try:
+                    master.after(delay, show_main)
+                except tk.TclError:
+                    break
 
 class MatchSummaryWindow(tk.Toplevel):
     def __init__(self, master, summary):

@@ -5,6 +5,7 @@
 #   bash sk-update.sh                    zoekt de USB-stick en werkt het programma bij
 #   bash sk-update.sh /pad/naar/map      gebruikt die map als bron in plaats van de USB-stick
 #   bash sk-update.sh --terug            zet de vorige versie terug
+#   bash sk-update.sh --bluetooth        alleen opnieuw koppelen toestaan (zonder USB-stick)
 # Opties:
 #   --ja               geen bevestiging vragen
 #   --geen-herstart    de SK-Box niet opnieuw opstarten
@@ -14,6 +15,9 @@
 #   ScoreKrijt (map), ScoreKrijt.py en scorekrijt_launcher.py
 # Instellingen (ScoreKrijtSettings.json) en wedstrijden (map matches) blijven behouden.
 # De vorige versie blijft bewaard als ScoreKrijt_vorige_<nummer>_<datum>.
+# Bij een update zet het script ook Bluetooth zo dat de SK-Box een telefoon opnieuw
+# accepteert nadat de SK-Box op de telefoon is vergeten (JustWorksRepairing = always in
+# /etc/bluetooth/main.conf). Een kopie van het origineel blijft bewaard als main.conf.sk-origineel.
 
 set -u
 
@@ -38,6 +42,7 @@ uitleg() { sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; }
 for arg in "$@"; do
   case "$arg" in
     --terug)         MODUS="terug" ;;
+    --bluetooth)     MODUS="bluetooth" ;;
     --ja)            JA=1 ;;
     --geen-herstart) HERSTART=0 ;;
     --help|-h)       uitleg; exit 0 ;;
@@ -214,6 +219,39 @@ installeer_scripts() {
   done
 }
 
+# Zorgt dat de SK-Box een telefoon opnieuw accepteert na "Vergeet" in de Bluetooth-instellingen
+# van de telefoon. BlueZ weigert dat standaard (JustWorksRepairing = never).
+# $1 = 1: Bluetooth meteen opnieuw starten (anders gebeurt dat bij de herstart).
+BT_CONF="/etc/bluetooth/main.conf"
+herstel_bluetooth() {
+  local herstart_bt="${1:-0}" gewijzigd=0
+  if [ ! -f "$BT_CONF" ]; then
+    info "Bluetooth-configuratie niet gevonden ($BT_CONF); overgeslagen."
+    return 0
+  fi
+  if grep -qE '^[[:space:]]*JustWorksRepairing[[:space:]]*=[[:space:]]*always' "$BT_CONF"; then
+    info "Opnieuw koppelen stond al aan."
+  else
+    [ -f "$BT_CONF.sk-origineel" ] || sudo cp -p "$BT_CONF" "$BT_CONF.sk-origineel"
+    if grep -qE '^[#[:space:]]*JustWorksRepairing' "$BT_CONF"; then
+      sudo sed -i -E 's/^[#[:space:]]*JustWorksRepairing.*/JustWorksRepairing = always/' "$BT_CONF"
+    else
+      sudo sed -i '/^\[General\]/a JustWorksRepairing = always' "$BT_CONF"
+    fi
+    if grep -qE '^[[:space:]]*JustWorksRepairing[[:space:]]*=[[:space:]]*always' "$BT_CONF"; then
+      info "Opnieuw koppelen toegestaan (JustWorksRepairing = always)."
+      gewijzigd=1
+    else
+      info "Let op: de instelling kon niet worden gezet. Voeg 'JustWorksRepairing = always' met de hand toe onder [General] in $BT_CONF."
+      return 0
+    fi
+  fi
+  if [ "$herstart_bt" -eq 1 ] && [ "$gewijzigd" -eq 1 ]; then
+    sudo systemctl restart bluetooth && info "Bluetooth is opnieuw gestart."
+  fi
+  return 0
+}
+
 doe_update() {
   [ -f "$PROGRAMMA/ScoreKrijt.py" ] || fout "Geen bestaande installatie gevonden in $PROGRAMMA. Voor een eerste installatie: zie de installatiehandleiding."
 
@@ -276,6 +314,9 @@ doe_update() {
 
   installeer_scripts "$BRON"
 
+  stap "Bluetooth: opnieuw koppelen toestaan"
+  herstel_bluetooth "$((1 - HERSTART))"
+
   stap "USB-stick losmaken"
   maak_stick_los
 
@@ -310,6 +351,7 @@ doe_terug() {
 }
 
 case "$MODUS" in
-  terug)  doe_terug ;;
+  terug)      doe_terug ;;
+  bluetooth)  stap "Bluetooth: opnieuw koppelen toestaan"; herstel_bluetooth 1 ;;
   *)      doe_update ;;
 esac

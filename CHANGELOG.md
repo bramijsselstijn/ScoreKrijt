@@ -1,5 +1,21 @@
 # ScoreKrijt changelog
 
+## SK-Box V2.8.8 – taakbalk met F12 en opnieuw koppelen
+
+Alleen de SK-Box is gewijzigd (code `2.8.8`, map `Phyton/V2.8.8`); de Android-app en het Bluetooth-protocol (versie 2) blijven ongewijzigd. De SK-Box en de Android-app hebben elk een eigen versienummer. Nog niet op een SK-Box getest.
+
+### SK-Box
+
+- F12 (taakbalk tonen of verbergen) werkt in elk ScoreKrijt-venster (`bind_all`), niet alleen in het venster waar de toets aan gebonden was.
+- Na het sluiten van het grote scherm met Esc krijgt het gewone venster opnieuw het toetsenbord, zodat F12 en de andere toetsen meteen werken.
+- De taakbalk wordt na het verbergen opgeruimd. Een gestopte taakbalk bleef eerder als zombie-proces staan, waardoor de volgende F12 de taakbalk niet meer toonde.
+
+### Hulpscripts en handleidingen
+
+- `sk-update.sh`: zet bij een update `JustWorksRepairing = always` in `/etc/bluetooth/main.conf`, zodat de SK-Box een telefoon opnieuw accepteert nadat de SK-Box op de telefoon is vergeten. Nieuwe optie `--bluetooth` doet alleen deze stap.
+- `sk-stille-opstart.sh`: zet de schermresolutie vast op 1080p (`video=HDMI-A-1:1920x1080@60`), met de opties `--resolutie=BREEDTExHOOGTE` en `--geen-resolutie`.
+- Installatiehandleiding: nieuw hoofdstuk 3.4 (schermresolutie vastzetten) en 8.3 (opnieuw koppelen toestaan). De bijwerkhandleiding beschrijft de Bluetooth-stap van het updatescript.
+
 ## V2.8.9 – Help en spelregels op het hoofdscherm en nieuwe pakketnaam
 
 Door de gebruiker getest op een telefoon op 2 november 2026.

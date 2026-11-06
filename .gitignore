@@ -16,7 +16,7 @@
 
 # --- Python (SK-Box): alleen de huidige versie ---
 /Phyton/*
-!/Phyton/V2.8.7/
+!/Phyton/V2.8.8/
 !/Phyton/SK-Box_scripts/
 # Door de SK-Box zelf gemaakt tijdens het draaien
 scorekrijt-autostart.log

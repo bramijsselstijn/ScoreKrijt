@@ -5,7 +5,7 @@ Scoreteller voor biljart: een Android-app voor op de telefoon en de SK-Box (Pyth
 Huidige versies:
 
 - **Android-app:** 2.8.9
-- **SK-Box (Python):** 2.8.7.1
+- **SK-Box (Python):** 2.8.8
 
 ## Gemaakt met behulp van AI
 
@@ -15,7 +15,7 @@ ScoreKrijt (de Android-app, de SK-Box-software, de hulpscripts en de handleiding
 
 ## Inhoud
 
-- `Phyton/V2.8.7/` – broncode van de SK-Box (huidige versie)
+- `Phyton/V2.8.8/` – broncode van de SK-Box (huidige versie)
 - `Phyton/SK-Box_scripts/` – hulpscripts voor de SK-Box: `sk-update.sh` (bijwerken via USB-stick, zonder internet) en `sk-stille-opstart.sh` (stille opstart met het ScoreKrijt-logo, taakbalk uit, wifi uit)
 - `Docs/` – handleidingen als pdf (SK-Box installeren, SK-Box bijwerken, Instellingen van de SK-Box). Daarnaast `Docs/Release-teksten-v2.8.7.md` voor de publicatie in de Google Play Store.
 - [`CHANGELOG.md`](CHANGELOG.md) – wat er per versie is veranderd
